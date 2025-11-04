@@ -1,0 +1,545 @@
+/*
+ * Styles specific to the Product Management page.
+ */
+
+/* --- Header Row Adjustments --- */
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  /* Allow buttons to wrap on small screens */
+  gap: 1rem;
+}
+
+.header-button.secondary {
+  background-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.header-button.secondary:hover {
+  background-color: #6b7280;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3);
+}
+
+
+/* --- Controls Card Specifics --- */
+.controls-card {
+  padding: 30px;
+}
+
+/* Filter Grid */
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  align-items: flex-end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+}
+
+.filter-group label {
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.filter-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  box-sizing: border-box;
+  height: 43.6px;
+  font-size: 0.9rem;
+  transition: all var(--transition-speed);
+  appearance: none;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+}
+
+/* Style calendar icon for date inputs */
+.filter-input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.7;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.filter-input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* Filter actions group */
+.filter-group-actions {
+  flex-shrink: 0;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+  grid-column: 1 / -1;
+  justify-content: flex-end;
+}
+
+.reset-button,
+.search-button {
+  padding: 10px 20px;
+  font-size:0.9rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- Product Table Specifics --- */
+
+.table-card {
+  position: relative;
+  /* This min-height prevents collapse on load AND fixes overflow */
+  min-height: 400px;
+}
+.table-container {
+  overflow-x: auto;
+}
+
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.product-table th:nth-child(1) {
+  width: 80px;
+}
+
+.product-table th:nth-child(2) {
+  width: 30%;
+}
+
+.product-table th:nth-child(3) {
+  width: 15%;
+}
+
+.product-table th:nth-child(4) {
+  width: 15%;
+}
+
+.product-table th:nth-child(5) {
+  width: 10%;
+}
+
+.product-table th:nth-child(6) {
+  width: 10%;
+}
+
+.product-table th:nth-child(7) {
+  width: 100px;
+}
+
+.product-table th,
+.product-table td {
+  padding: 1rem 1.25rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+.product-table td {
+  color: var(--text-secondary);
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  word-break: break-word;
+}
+
+.product-table th:nth-child(2),
+.product-table td[data-label="Product"],
+.product-table th:nth-child(3),
+.product-table td[data-label="Client"] {
+  text-align: left;
+}
+
+.product-table td[data-label="Product"] {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.data-table th {
+  white-space: nowrap;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.product-table tbody tr {
+  transition: background-color var(--transition-speed) ease;
+}
+
+.product-table tbody tr:hover {
+  background-color: var(--row-hover);
+}
+
+.product-image {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid var(--border-color);
+  margin: 0 auto;
+  display: block;
+}
+
+.inventory-badge {
+  padding: 5px 12px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  min-width: 60px;
+  display: inline-block;
+}
+
+.high-stock {
+  background-color: rgba(56, 161, 105, 0.2);
+  color: #68d391;
+}
+
+.low-stock {
+  background-color: rgba(237, 137, 54, 0.2);
+  color: #f6ad55;
+}
+
+.out-of-stock {
+  background-color: rgba(229, 62, 62, 0.2);
+  color: #fc8181;
+}
+
+.actions-cell {
+  text-align: center;
+}
+
+.action-button {
+  padding: 6px 12px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  display: inline-block;
+}
+
+.action-button.edit:hover {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+}
+
+/* --- Pagination Controls Styles --- */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1.5rem;
+
+
+  color: var(--text-secondary);
+}
+
+.pagination-controls button {
+  padding: 8px 16px;
+  border: none;
+  background-color: var(--border-color);
+  color: var(--text-primary);
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all var(--transition-speed) ease;
+}
+
+.pagination-controls button:hover:not(:disabled) {
+  background-color: #6b7280;
+}
+
+.pagination-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-weight: 600;
+}
+
+/* --- MODAL STYLES --- */
+.modal-content.upload-modal p {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* --- NEW: Sample Download Link Styles --- */
+.sample-download-container {
+  margin-bottom: 1.5rem;
+  /* Space below link */
+}
+
+.sample-download-link {
+  background: none;
+  border: none;
+  color: var(--accent-color);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 5px 0;
+  display: inline-flex;
+  /* Align icon and text */
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s ease;
+}
+
+.sample-download-link:hover {
+  color: var(--link-hover-color);
+  text-decoration: underline;
+}
+
+.sample-download-link svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* --- END NEW --- */
+
+
+.modal-content.upload-modal .file-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 0.5rem;
+}
+
+.modal-content.upload-modal .file-input-label {
+  flex-grow: 1;
+  background-color: var(--input-bg);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  box-sizing: border-box;
+  height: 43.6px;
+  transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+.modal-content.upload-modal .custom-file-input:focus+.file-input-label {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+}
+
+.modal-content.upload-modal .custom-file-input {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+.report-download-modal {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.report-download-modal p {
+  margin-bottom: 1rem;
+}
+
+.download-report-btn {
+  width: 100%;
+}
+
+/* Modal Form Group Label (Add/Edit) */
+.modal-body .form-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.modal-body .form-group {
+  margin-bottom: 1.25rem;
+}
+
+/* Form Control Placeholder Color */
+.form-control::placeholder {
+  color: var(--text-secondary);
+}
+
+/* Loading/Empty States */
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 5rem 0;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid var(--border-color);
+  border-top: 5px solid var(--accent-color);
+  border-radius: 50%;
+  margin: 0 auto 1.5rem auto;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.content-stage {
+  position: relative;
+  /* This sets the minimum height of the card during transitions */
+  min-height: 400px;
+}
+
+.content-wrapper {
+  /* This holds the table/pagination content */
+  width: 100%;
+}
+
+.loader-wrapper,
+.content-wrapper {
+  /* This stacks the loader and content on top of each other */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.loader-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+
+  /* --- THIS IS THE FIX --- */
+  /* It floats on top of the card */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* It guarantees the card's min-height */
+  min-height: 400px;
+  /* --- END OF FIX --- */
+
+  box-sizing: border-box;
+}
+
+/* This rule can now be simpler */
+.empty-state {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  /* Remove padding, as .loader-wrapper handles spacing */
+  padding: 0;
+}
+
+.empty-state h2 {
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 767px) {
+  .header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .header-button {
+    width: 100%;
+  }
+
+  .product-table th,
+  .product-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .product-image {
+    width: 40px;
+    height: 40px;
+  }
+
+  .action-button {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+  }
+
+  .pagination-controls {
+    gap: 0.5rem;
+  }
+
+  .pagination-controls button {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+
+  .page-info {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-actions {
+    grid-template-columns: 1fr;
+  }
+}

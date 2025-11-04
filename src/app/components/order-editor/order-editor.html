@@ -1,0 +1,132 @@
+<!-- Main container -->
+<div class="page-container">
+
+  <!-- Header -->
+  <div class="header-row position-relative">
+    <button class="btn btn-outline-secondary back-button" routerLink="/orders">← Back to Orders</button>
+    <h1>{{ isEditMode ? 'Edit Order #' + orderIdToEdit : 'Create New Order' }}</h1>
+  </div>
+
+  <div class="row g-4">
+    <!-- Left Card: Order Items -->
+    <div class="col-lg-7">
+      <div class="card">
+        <h3>Add Item</h3>
+        <form class="add-item-form mb-4 pb-4 border-bottom-separator" (ngSubmit)="addItem()">
+        
+        <div class="row g-2">
+          
+          <div class="col-12 col-sm-4">
+            <label for="barcodeInput" class="form-label">Barcode</label>
+            <input type="text"
+                   id="barcodeInput"
+                   class="form-control"
+                   [(ngModel)]="barcodeInput"
+                   name="barcode"
+                   placeholder="Enter barcode..."
+                   autofocus>
+          </div>
+          
+          <div class="col-6 col-sm-2">
+            <label for="quantityInput" class="form-label">Qty</label>
+            <input type="text"
+                   id="quantityInput"
+                   class="form-control"
+                   [(ngModel)]="quantityInput"
+                   name="quantity"
+                   placeholder="Qty"
+                   inputmode="numeric" 
+                   pattern="[0-9]*"   
+                   (keydown)="onQuantityKeyDown($event)"
+                   (ngModelChange)="onQuantityInputChange($event)">
+          </div>
+          
+          <div class="col-6 col-sm-3">
+            <label for="sellingPriceInput" class="form-label">Price (Optional)</label>
+            <input type="text"
+                   id="sellingPriceInput"
+                   class="form-control"
+                   [(ngModel)]="sellingPriceInput"
+                   name="sellingPrice"
+                   placeholder="Default: MRP"
+                   inputmode="numeric"
+                   pattern="[0-9]*\.?[0-9]*" 
+                   (keydown)="onSellingPriceKeyDown($event)"
+                   (ngModelChange)="onSellingPriceInputChange($event)">
+          </div>
+
+          <div class="col-12 col-sm-3 d-flex align-items-end justify-content-end">
+            <button type="submit" class="btn btn-primary add-item-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg me-1" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2" stroke="currentColor" stroke-width="0.5"/>
+              </svg>
+              Add
+            </button>
+          </div>
+
+        </div>
+        </form>
+        <h3>Order Items</h3>
+        <div class="items-list flex-grow-1">
+          @for (item of items; track $index) {
+          <div class="item-row">
+            <span class="item-name">{{ item.productName }}</span>
+            <div class="item-details">
+              <div class="quantity-control">
+                <button type="button" class="qty-btn" (click)="decreaseQuantity($index)">-</button>
+                <span>{{ item.quantity }}</span>
+                <button type="button" class="qty-btn" (click)="increaseQuantity($index)">+</button>
+              </div>
+              <span class="item-unit-price">{{ item.quantity }} x {{ item.sellingPrice | currency:'INR' }}</span>
+              <span class="item-total">{{ (item.quantity * item.sellingPrice) | currency:'INR' }}</span>
+              <button type="button" class="remove-btn" (click)="removeItem($index)">×</button>
+            </div>
+          </div>
+          } @empty {
+          <p class="empty-message">Add a product to begin.</p>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Card: Order Summary -->
+    <div class="col-lg-5">
+      <div class="card h-100 d-flex flex-column">
+        <h3>Order Summary</h3>
+        <div class="order-summary-details">
+          <!-- --- FIX: Simplified summary to only show item count --- -->
+          <div class="summary-row">
+            <span>Items</span>
+            <span>{{ items.length }}</span>
+          </div>
+          <!-- --- REMOVED Total row --- -->
+        </div>
+
+        <!-- Structure improved slightly -->
+        <div class="customer-info-section">
+          <!-- --- FIX: Changed h4 to h3 --- -->
+          <h3>Customer Information</h3>
+          <div class="mb-3">
+            <label for="customerNameInput" class="form-label">Customer Name (Optional)</label>
+            <input type="text" id="customerNameInput" class="form-control" [(ngModel)]="customerName" name="customerName" placeholder="e.g. Ramesh Kumar">
+          </div>
+          <div class="mb-3">
+            <label for="customerPhoneInput" class="form-label">Customer Phone (Optional)</label>
+            <input type="text" id="customerPhoneInput" class="form-control" [(ngModel)]="customerPhone" name="customerPhone" placeholder="e.g. 9876543210">
+          </div>
+          
+          <button class="btn place-order-btn mt-auto" (click)="submitOrder()" [disabled]="isSubmitting || items.length === 0">
+            @if(isSubmitting) {
+              <div class="button-spinner small white"></div>
+              <span>{{ isEditMode ? 'Updating...' : 'Placing Order...' }}</span>
+            } @else {
+              <span>{{ isEditMode ? 'Update Order' : 'Place Order' }}</span>
+            }
+          </button>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+

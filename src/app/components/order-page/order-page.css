@@ -1,0 +1,388 @@
+.controls-card {
+  display: flex;
+  flex-direction: row;
+  /* THE FIX: Explicitly set to row to override Bootstrap */
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: flex-end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 200px;
+}
+
+.filter-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.filter-group-actions {
+  flex-shrink: 0;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+}
+
+.search-input-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.search-button {
+  padding: 10px 20px;
+  background-color: var(--accent-color);
+  color: white;
+  border: 1px solid var(--accent-color);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all var(--transition-speed) ease;
+}
+
+.search-button:hover {
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
+}
+
+.filter-input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1); /* Inverts the default black icon to white */
+  opacity: 0.7; /* Make it slightly subtle */
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.filter-input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1; /* Full white on hover */
+}
+
+/* --- DATA TABLE & ACCORDION (Your original styles) --- */
+.table-container {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  margin-bottom:0;
+  border-collapse: collapse;
+}
+
+.data-table th.col-id {
+  text-align: left;
+}
+
+.data-table td[data-label="ID"] {
+  text-align: left;
+}
+
+.data-table th.col-actions {
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+  width: min-content;
+}
+
+.data-table th.col-expand {
+  padding-left: 0 !important;
+  width: min-content;
+}
+
+.data-table td.actions-cell {
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+  width: min-content;
+}
+
+.data-table th,
+.data-table td {
+  padding: 1rem 1.25rem;
+  text-align: center;
+  /* Default alignment */
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.data-table td {
+  color: var(--text-secondary);
+}
+
+.data-table th {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.data-table tbody tr.order-row {
+  transition: background-color var(--transition-speed);
+}
+
+.data-table tbody tr.order-row:hover {
+  background-color: var(--row-hover);
+  cursor: pointer;
+}
+
+.data-table tbody tr.order-row.expanded {
+  background-color: var(--row-hover);
+  border-bottom-color: transparent;
+}
+
+.col-amount-data {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.id-cell {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.expand-cell {
+  padding-left: 0 !important;
+}
+
+.expand-indicator {
+  border: solid var(--text-secondary);
+  border-width: 0 2px 2px 0;
+  display: inline-block;
+  justify-self: flex-end;
+  padding: 3px;
+  transform: rotate(45deg);
+  opacity: 0;
+  transition: transform 0.4s ease, opacity 0.2s ease;
+  margin-left: 8px;
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  box-sizing: border-box;
+}
+
+.order-row:hover .expand-cell .expand-indicator {
+  opacity: 1;
+}
+
+.order-row.expanded .expand-cell .expand-indicator {
+  transform: rotate(-135deg);
+  opacity: 1;
+}
+
+/* CSS Animation for Accordion (Max-Height technique) */
+.details-row td {
+  padding: 0;
+  border: 0;
+}
+
+.details-content {
+  background-color: var(--input-bg);
+  overflow: hidden;
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  transition: max-height 0.5s ease-in-out, padding-top 0.5s ease-in-out, padding-bottom 0.5s ease-in-out;
+}
+
+.details-row.expanded .details-content {
+  max-height: 1000px;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.details-row td>.details-content {
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+}
+
+.details-content h4 {
+  margin-bottom:0;
+  padding: 0 0 1rem 0;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 1.1rem;
+}
+
+.details-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.details-table th,
+.details-table td {
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.75rem 1rem;
+  vertical-align: middle;
+  text-align: right;
+}
+
+.details-table th:first-child,
+.details-table td:first-child {
+  text-align: left;
+}
+
+.details-table th {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.details-table td {
+  color: var(--text-primary);
+}
+
+.details-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.subtotal-cell {
+  font-weight: 600;
+}
+
+/* --- STATUS BADGES & BUTTONS (Your original styles) --- */
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: white;
+  text-transform: capitalize;
+}
+
+.status-created {
+  background-color: var(--status-created);
+}
+
+.status-invoiced {
+  background-color: var(--status-invoiced);
+}
+
+.status-cancelled {
+  background-color: var(--status-cancelled);
+}
+
+.actions-cell {
+  text-align: right;
+  padding-right: 0 !important;
+}
+
+.action-buttons-wrapper {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.action-button {
+  padding: 8px 16px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.action-button.edit {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.action-button.edit:hover {
+  background: var(--accent-color);
+  color: white;
+}
+
+.action-button.generate:hover {
+  background: var(--status-created);
+  border-color: var(--status-created);
+  color: white;
+}
+
+.action-button.download:hover {
+  background: var(--status-invoiced);
+  border-color: var(--status-invoiced);
+  color: white;
+}
+
+.action-button.cancel {
+  border-color: var(--danger-color);
+  color: var(--danger-color);
+}
+
+.action-button.cancel:hover {
+  background: var(--danger-color);
+  color: white;
+}
+
+.loader-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* This centers it vertically */
+
+  /* --- FIX: REMOVE this line --- */
+  /* padding-top: 3rem; */
+
+  /* --- FIX: ADD this line --- */
+  text-align: center; /* This centers the "Loading orders..." text */
+
+  color: var(--text-secondary);
+  font-size: 1rem;
+  min-height: 400px;
+  box-sizing: border-box;
+
+}
+
+/* --- PAGINATION & MODAL (Your original styles) --- */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  color: var(--text-secondary);
+}
+
+.pagination-controls button {
+  padding: 8px 16px;
+  background-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.pagination-controls button:hover {
+  background-color: #6b7280;
+}
+
+.pagination-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modal-body p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.button-primary.confirm-invoice {
+  background-color: var(--status-invoiced);
+}
+
+.button-primary.confirm-invoice:hover {
+  background-color: #15803d;
+}
+
+.button-primary.confirm-cancel {
+  background-color: var(--danger-color);
+}
+
+.button-primary.confirm-cancel:hover {
+  background-color: var(--danger-hover);
+}

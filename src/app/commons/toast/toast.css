@@ -1,0 +1,181 @@
+:host {
+  --toast-success: #2f855a;
+  --toast-success-light: #38a169;
+  --toast-error: #c53030;
+  --toast-error-light: #e53e3e;
+  --notification-dot-color: #e53e3e;
+}
+
+/* --- 1. THE STACK CONTAINER --- */
+.toast-stack-container {
+  position: fixed;
+  top: 25px;
+  right: 25px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+/* --- 2. INDIVIDUAL TOAST STYLES --- */
+.toast-container {
+  position: relative;
+  min-width: 300px;
+  max-width: 400px;
+  padding: 16px 24px;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  color: white;
+  font-weight: 500;
+  overflow: hidden;
+  animation: slide-in 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  pointer-events: auto;
+}
+
+/* * --- THE FIX (Part 1) ---
+ * We give the content a position and z-index to
+ * lift it *above* the ::before and ::after elements.
+*/
+.toast-container span {
+  flex-grow: 1;
+  word-break: break-word;
+  position: relative; /* Add position */
+  z-index: 2;       /* Lift it */
+}
+
+/* --- 3. BLINKING RED NOTIFICATION DOT (for Error) --- */
+/* * --- THE FIX (Part 2) ---
+ * Changed from .success to .error to match the red dot.
+ * Added z-index: 1 to place it *below* the content.
+*/
+.toast-container.error::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--notification-dot-color);
+  box-shadow: 0 0 8px var(--notification-dot-color);
+  animation: blink 1.5s ease-in-out infinite;
+  z-index: 1; /* Place it *below* the button */
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+/* --- 4. SLOWER, FADING SHIMMER BACKGROUND --- */
+.toast-container.success,
+.toast-container.error {
+  background-size: 200% 100%;
+  animation: slide-in 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+             subtle-shimmer 4s cubic-bezier(0.42, 0, 0.58, 1) infinite;
+}
+
+.toast-container.success {
+  background-image: linear-gradient(
+    110deg, 
+    var(--toast-success), 
+    var(--toast-success-light) 45%, 
+    var(--toast-success-light) 55%, 
+    var(--toast-success)
+  );
+}
+
+.toast-container.error {
+  background-image: linear-gradient(
+    110deg, 
+    var(--toast-error), 
+    var(--toast-error-light) 45%, 
+    var(--toast-error-light) 55%, 
+    var(--toast-error)
+  );
+}
+
+@keyframes subtle-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* --- 5. PROGRESS BAR --- */
+/* * --- THE FIX (Part 3) ---
+ * Added z-index: 1 to place it *below* the content.
+*/
+.toast-container::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  animation: progress 3.6s linear forwards;
+  z-index: 1; /* Place it *below* the button */
+}
+
+@keyframes progress {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+/* --- 6. ENTER & EXIT ANIMATIONS --- */
+@keyframes slide-in {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.toast-container.hiding {
+  animation: slide-out 0.4s ease-in forwards;
+}
+
+@keyframes slide-out {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(120%); opacity: 0; }
+}
+
+/* --- 7. OTHER ELEMENTS --- */
+/* * --- THE FIX (Part 4) ---
+ * We give the button a position and z-index to
+ * lift it *above* the ::before and ::after elements.
+*/
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.6rem;
+  font-weight: bold;
+  cursor: pointer !important;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  padding: 4px 8px;
+  line-height: 1;
+  position: relative; /* Add position */
+  z-index: 3;       /* Lift it higher */
+  min-width: 32px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto !important;
+}
+
+.close-btn:hover {
+  opacity: 1;
+  cursor: pointer !important;
+}
+
+.close-btn:focus {
+  outline: none;
+}
+

@@ -1,0 +1,253 @@
+/* Professional Navbar CSS */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+:host {
+  --navbar-bg: #1a202c;
+  --navbar-height: 65px;
+  --brand-color: #ffffff;
+  --link-color: #a0aec0;
+  --link-hover-color: #ffffff;
+  --accent-color: #4299e1;
+  --text-primary: #edf2f7;
+  --text-secondary: #a0aec0;
+  --danger-color: #e53e3e;
+  --danger-hover: #c53030;
+  --success-color: #38a169;
+  --border-color: #4a5568;
+  --shadow-color: rgba(0, 0, 0, 0.4);
+  --dropdown-bg: #2d3748;
+}
+
+.navbar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  height: var(--navbar-height);
+  padding: 0 40px;
+  background: var(--navbar-bg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 1000; /* Base z-index */
+  font-family: 'Poppins', sans-serif;
+}
+
+.nav-brand {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--brand-color);
+  text-decoration: none;
+  letter-spacing: 1px;
+}
+
+/* Desktop links */
+.nav-links.desktop-nav-links {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.nav-links a {
+  color: var(--link-color);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 10px 5px;
+  position: relative;
+  transition: color 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+.nav-links a::after {
+  content: ''; position: absolute; bottom: 0; left: 0;
+  width: 100%; height: 2px; background-color: var(--accent-color);
+  transform: scaleX(0); transform-origin: bottom right;
+  transition: transform 0.3s ease-out;
+}
+.nav-links a:hover {
+  color: var(--link-hover-color);
+  transform: translateY(-2px);
+}
+.nav-links a:hover::after,
+.nav-links a.active-link::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+.nav-links a.active-link {
+  color: var(--link-hover-color);
+}
+
+/* --- User Section & Avatar Dropdown --- */
+.user-section {
+  position: relative;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  z-index: 1010; /* Give user-section a higher context than navbar */
+}
+
+.profile-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--accent-color); color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; font-weight: 600;
+  border: 2px solid var(--border-color); cursor: pointer;
+  transition: all 0.3s ease; padding: 0;
+  position: relative;
+  /* z-index: 3; /* No longer needed, parent has z-index */
+}
+.profile-avatar:hover,
+.profile-avatar:focus {
+  outline: none; border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+  transform: scale(1.05);
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 10px); right: 0;
+  width: 240px; background: var(--dropdown-bg);
+  border: 1px solid var(--border-color); border-radius: 8px;
+  box-shadow: 0 5px 15px var(--shadow-color);
+  overflow: hidden;
+  z-index: 2; /* Just needs to be above avatar */
+  pointer-events: auto;
+}
+.dropdown-header {
+  padding: 15px; background-color: rgba(0,0,0,0.1);
+}
+.dropdown-email {
+  color: var(--text-primary); font-size: 0.9rem; font-weight: 500;
+  margin-bottom: 4px; word-break: break-all;
+}
+.dropdown-role {
+  display: inline-block; font-size: 0.75rem; font-weight: 600;
+  padding: 2px 8px; border-radius: 12px; text-transform: uppercase;
+}
+.dropdown-role.supervisor { background-color: var(--success-color); color: white; }
+.dropdown-role.operator { background-color: var(--accent-color); color: white; }
+.dropdown-divider {
+  height: 1px; background-color: var(--border-color); margin: 0;
+}
+.dropdown-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 15px; background: none; border: none;
+  color: var(--text-secondary) !important;
+  width: 100%; text-align: left; font-size: 0.9rem; font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease; /* Added transform */
+}
+.dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary) !important;
+}
+.dropdown-item svg { flex-shrink: 0; }
+.dropdown-item.logout { color: var(--danger-color) !important; }
+.dropdown-item.logout:hover {
+  background-color: var(--danger-color) !important;
+  color: var(--brand-color) !important;
+
+}
+
+.user-section-placeholder { width: 40px; height: 40px; }
+
+/* --- REMOVED: .backdrop style --- */
+
+
+/* --- NEW: Mobile Menu Styles --- */
+
+.mobile-menu-toggle {
+  display: none; /* Hidden by default */
+  background: none;
+  border: none;
+  color: var(--link-color);
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 6px;
+  transition: color 0.2s ease, background-color 0.2s ease;
+  /* z-index: 3; /* No longer needed, parent has z-index */
+}
+.mobile-menu-toggle:hover {
+  color: var(--link-hover-color);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.mobile-menu-toggle svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2.5;
+}
+
+/* Mobile dropdown container */
+.mobile-nav-links {
+  position: fixed; /* Fixed position below navbar */
+  top: var(--navbar-height); /* Start right below navbar */
+  left: 0;
+  right: 0;
+  background: var(--dropdown-bg); /* Use dropdown bg */
+  z-index: 999; /* Below navbar, above main page content */
+  box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+  border-bottom: 1px solid var(--border-color);
+  overflow: hidden;
+  
+  display: flex;
+  flex-direction: column;
+}
+.mobile-nav-links a {
+  color: var(--link-color);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 16px 40px;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.mobile-nav-links a:last-child {
+  border-bottom: none;
+}
+.mobile-nav-links a:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--link-hover-color);
+}
+.mobile-nav-links a.active-link {
+  color: var(--link-hover-color);
+  background-color: rgba(66, 153, 225, 0.1);
+  font-weight: 600;
+}
+
+
+/* --- Responsive Design --- */
+@media (max-width: 991px) {
+  .navbar { padding: 0 20px; }
+  .nav-links.desktop-nav-links {
+    gap: 10px;
+  }
+  .nav-links a {
+    font-size: 0.9rem;
+    padding: 8px 4px;
+  }
+  .user-section { gap: 10px; }
+  .profile-avatar { width: 36px; height: 36px; font-size: 1.1rem; }
+  .profile-dropdown { width: 220px; top: calc(100% + 8px); }
+  
+  .mobile-nav-links a {
+    padding: 16px 20px;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Hide desktop links, show mobile toggle */
+  .nav-links.desktop-nav-links {
+    display: none;
+  }
+  .mobile-menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .navbar {
+    grid-template-columns: auto 1fr auto;
+  }
+  .user-section {
+    gap: 8px;
+  }
+}
+

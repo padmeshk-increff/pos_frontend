@@ -1,1 +1,748 @@
-/* You can add global styles to this file, and also import other style files */
+/* ==========================================================================
+   1. FONT IMPORT
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* ==========================================================================
+   2. GLOBAL THEME & COLOR PALETTE
+   ========================================================================== */
+
+:root {
+  --card-bg: #2d3748;
+  --bg-main: #1a202c;
+  --input-bg: #171e2b;
+  --text-primary: #edf2f7;
+  --text-secondary: #a0aec0;
+  --accent-color: #4299e1;
+  --accent-hover: #2b6cb0;
+  --success-color: #38a169;
+  --success-hover: #2f855a;
+  --danger-color: #e53e3e;
+  --danger-hover: #c53030;
+  --border-color: #4a5568;
+  --shadow-color: rgba(0, 0, 0, 0.4);
+  --row-hover: rgba(255, 255, 255, 0.05);
+  --transition-speed: 0.3s;
+  --status-created: #3b82f6;
+  --status-invoiced: #16a34a;
+  --status-cancelled: #ef4444;
+}
+
+/* ==========================================================================
+   3. BASE STYLES & TYPOGRAPHY
+   ========================================================================== */
+body {
+  background-color: var(--bg-main);
+  color: var(--text-secondary);
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--text-primary);
+  font-weight: 700;
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 0 !important;
+}
+
+h1 {
+  font-size: 2.5rem;
+  letter-spacing: -1px;
+}
+
+/* ==========================================================================
+   4. SHARED LAYOUT COMPONENTS
+   ========================================================================== */
+.page-container {
+  max-width: 1400px;
+  margin: 2rem auto;
+  padding: 20px;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 30px;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px var(--shadow-color);
+  border: 1px solid var(--border-color);
+}
+
+/* ==========================================================================
+   4.5 INPUT PLACEHOLDER STYLES
+   ========================================================================== */
+input::placeholder,
+select::placeholder {
+  color: var(--text-secondary) !important;
+}
+
+
+/* ==========================================================================
+   5. YOUR FLAWLESS CUSTOM MODAL STYLES (PRESERVED)
+   ========================================================================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleDown {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  to {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
+  animation: fadeIn var(--transition-speed) ease-out;
+}
+
+.modal-content {
+  background: var(--card-bg);
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 15px 40px var(--shadow-color);
+  animation: scaleUp var(--transition-speed) ease-out;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-backdrop.closing {
+  animation: fadeOut var(--transition-speed) ease-in forwards;
+}
+
+.modal-content.closing {
+  animation: scaleDown var(--transition-speed) ease-in forwards;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 15px;
+  margin-bottom: 25px;
+  flex-shrink: 0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+}
+
+.modal-body {
+  overflow-y: auto;
+  flex-grow: 1;
+  padding-right: 15px;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 2.2rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-speed), transform var(--transition-speed);
+}
+
+.close-button:hover {
+  color: var(--text-primary);
+  transform: rotate(90deg);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   6. SHARED FORM & BUTTON STYLES (WITH BOOTSTRAP OVERRIDES)
+   ========================================================================== */
+.form-group,
+.mb-3 {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label,
+.form-label {
+  display: inline-block;
+  /* THE FIX: Stops the label from spanning the full row */
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* THE FIX: These rules now style Bootstrap's .form-control and .form-select */
+.form-control,
+.form-select,
+.filter-input,
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="email"],
+input[type="password"],
+select {
+  width: 100%;
+  padding: 10px 15px;
+  border-radius: 6px;
+  background-color: var(--input-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  box-sizing: border-box;
+  font-size: 0.9rem !important;
+  transition: all var(--transition-speed) !important;
+  appearance: none !important;
+}
+
+.form-control:focus,
+.form-select:focus,
+.filter-input:focus,
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+select:focus {
+  outline: none !important;
+  border-color: var(--accent-color) !important;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5) !important;
+}
+
+input:disabled,
+.form-control:disabled {
+  background-color: #384252 !important;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.select-wrapper {
+  position: relative;
+}
+
+.select-wrapper::after {
+  content: '▼';
+  font-size: 0.6rem;
+  color: var(--text-secondary);
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+button {
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all var(--transition-speed) ease;
+}
+
+.header-button,
+.button-primary {
+  padding: 10px 20px;
+  background: var(--accent-color);
+  color: white;
+}
+
+.header-button:hover,
+.button-primary:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
+}
+
+.button-secondary {
+  padding: 11px 20px;
+  font-size:0.9rem;
+  background: #4a5568;
+  color: white;
+}
+
+.button-secondary:hover {
+  background-color: #718096;
+}
+
+.action-button,
+.pagination-controls button {
+  padding: 8px 16px;
+}
+
+.button-success {
+  /* Inherit base button styles from global */
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all var(--transition-speed) ease;
+
+  /* Apply success colors from theme */
+  background-color: var(--success-color) !important;
+  border-color: var(--success-color) !important;
+  color: white !important;
+
+  /* Ensure flex properties for spinner */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.button-success:hover:not(:disabled) {
+  background-color: var(--success-hover) !important;
+  border-color: var(--success-hover) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(56, 161, 105, 0.4);
+}
+
+.button-success:disabled {
+  background-color: #4a5568 !important;
+  border-color: #4a5568 !important;
+  cursor: not-allowed;
+  opacity: 0.65;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Button Spinner */
+.button-spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid var(--border-color);
+  border-top: 3px solid var(--accent-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+.button-spinner.small {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+  margin: 0;
+}
+
+.button-spinner.small.white {
+  border-color: rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1.0);
+  }
+}
+
+/* The container for the dots */
+.fancy-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.5rem; /* Space between loader and text */
+}
+
+/* A single dot */
+.fancy-loader .dot {
+  width: 12px;
+  height: 12px;
+  background-color: var(--accent-color); /* Your theme's color! */
+  border-radius: 50%;
+  margin: 0 5px;
+  
+  /* Run the animation, but delayed for each dot */
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+/* Animation delays to create the wave effect */
+.fancy-loader .dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.fancy-loader .dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+/* ==========================================================================
+   7. SHARED UTILITY STYLES
+   ========================================================================== */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 5rem 0;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid var(--border-color);
+  border-top: 5px solid var(--accent-color);
+  border-radius: 50%;
+  margin: 0 auto 1.5rem auto;
+  animation: spin 1s linear infinite;
+}
+
+.empty-state h2 {
+  color: var(--text-primary);
+}
+
+.empty-state-icon {
+  color: var(--border-color);
+  margin-bottom: 1rem;
+}
+
+/* ==========================================================================
+   8. AUTH PAGE STYLES (Login & Signup)
+   ========================================================================== */
+.auth-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 450px;
+}
+
+.auth-title {
+  font-size: 2.5rem;
+  letter-spacing: -1px;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.auth-subtitle {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth-link-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.auth-link {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color var(--transition-speed);
+}
+
+.auth-link:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   6.1 BOOTSTRAP 5 CLASS MAPPINGS TO PROJECT THEME (NO VISUAL CHANGE)
+   ========================================================================== */
+/* Buttons */
+.btn {
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  transition: all var(--transition-speed) ease !important;
+}
+
+.btn:focus {
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5) !important;
+}
+
+.btn-primary {
+  background: var(--accent-color) !important;
+  border-color: var(--accent-color) !important;
+  color: #fff !important;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover) !important;
+  border-color: var(--accent-hover) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3) !important;
+}
+
+.btn-secondary {
+  background: #4a5568 !important;
+  border-color: #4a5568 !important;
+  color: #fff !important;
+}
+
+.btn-secondary:hover {
+  background: #718096 !important;
+  border-color: #718096 !important;
+}
+
+.btn-success {
+  background: var(--success-color) !important;
+  border-color: var(--success-color) !important;
+  color: #fff !important;
+}
+
+.btn-danger {
+  background: var(--danger-color) !important;
+  border-color: var(--danger-color) !important;
+  color: #fff !important;
+}
+
+/* Form Controls */
+.form-control,
+.form-select {
+  background-color: var(--input-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+  outline: none !important;
+  border-color: var(--accent-color) !important;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5) !important;
+}
+
+.form-check-input {
+  background-color: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+.form-check-input:checked {
+  background-color: var(--accent-color) !important;
+  border-color: var(--accent-color) !important;
+}
+
+/* Tables */
+.table {
+  color: var(--text-secondary) !important;
+  background-color: transparent !important;
+  --bs-table-hover-bg: transparent !important
+}
+
+.table> :not(caption)>*>* {
+  background-color: transparent !important;
+  border-bottom-color: var(--border-color) !important;
+}
+
+.table-dark {
+  --bs-table-bg: transparent !important;
+  --bs-table-striped-bg: rgba(255, 255, 255, 0.03) !important;
+  --bs-table-striped-color: var(--text-secondary) !important;
+  color: var(--text-secondary) !important;
+  background-color: transparent !important;
+  --bs-table-hover-bg: transparent !important;
+}
+
+.table-hover tbody tr:hover {
+  background-color: var(--row-hover) !important;
+}
+
+.table-responsive {
+  background-color: transparent !important;
+}
+
+
+/* Alerts */
+.alert {
+  border-radius: 8px !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.alert-success {
+  background-color: rgba(56, 161, 105, 0.15) !important;
+  border-color: var(--success-color) !important;
+}
+
+.alert-danger {
+  background-color: rgba(229, 62, 62, 0.15) !important;
+  border-color: var(--danger-color) !important;
+}
+
+.alert-primary {
+  background-color: rgba(66, 153, 225, 0.15) !important;
+  border-color: var(--accent-color) !important;
+}
+
+/* Badges */
+.badge {
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+}
+
+.badge.bg-success {
+  background-color: var(--success-color) !important;
+}
+
+.badge.bg-primary {
+  background-color: var(--accent-color) !important;
+}
+
+.badge.bg-danger {
+  background-color: var(--danger-color) !important;
+}
+
+/* Cards */
+.card {
+  background: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-secondary) !important;
+  box-shadow: 0 10px 30px var(--shadow-color) !important;
+}
+
+.card-header {
+  border-bottom: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Dropdowns */
+.dropdown-menu {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 10px 30px var(--shadow-color) !important;
+}
+
+.dropdown-item {
+  color: var(--text-secondary) !important;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: var(--row-hover) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Modals */
+.modal-content {
+  background: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+.modal-header,
+.modal-footer {
+  border-color: var(--border-color) !important;
+}
+
+.btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%) !important;
+}
+
+/* Navs/Tabs */
+.nav-link {
+  color: var(--text-secondary) !important;
+}
+
+.nav-link.active,
+.nav-link:hover {
+  color: var(--text-primary) !important;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: transparent !important;
+  border-color: var(--border-color) var(--border-color) transparent !important;
+}

@@ -1,0 +1,29 @@
+<div class="auth-container">
+  <div class="card auth-card">
+    <h1 class="auth-title">Increff POS</h1>
+    <h3 class="auth-subtitle">Welcome Back</h3>
+    
+    <form (ngSubmit)="login()" class="mt-4">
+      <div class="mb-3">
+        <label for="email" class="form-label">Email Address</label>
+        <input type="email" id="email" class="form-control" [(ngModel)]="form.email" name="email" required>
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" id="password" class="form-control" [(ngModel)]="form.password" name="password" required>
+      </div>
+      <button type="submit" class="button-primary btn btn-primary w-100 mt-3" [disabled]="isLoading">
+        @if(isLoading) {
+          <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+        }
+        <span>Login</span>
+      </button>
+    </form>
+    
+    <div class="auth-link-footer">
+      <span class="text-secondary">Don't have an account?</span>
+      <a routerLink="/signup" class="auth-link ms-1">Sign Up</a>
+    </div>
+  </div>
+</div>
+

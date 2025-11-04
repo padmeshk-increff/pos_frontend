@@ -1,0 +1,191 @@
+<div class="page-container">
+
+  <div class="header-row">
+    <h1>Order Management</h1>
+    <button class="header-button" (click)="navigateToCreateOrder()">+ Create New Order</button>
+  </div>
+
+  <div class="card controls-card" @shellFadeIn>
+    <div class="filter-group">
+      <label for="orderId">Search by Order ID</label>
+      <input id="orderId" type="text" class="filter-input" placeholder="e.g., 32" [ngModel]="searchOrderId"
+        (ngModelChange)="onSearchInputChange($event)" (keyup.enter)="onSearchClick()" (keydown)="onKeyDown($event)" />
+    </div>
+    <div class="filter-group">
+      <label for="startDate">Start Date</label>
+      <input id="startDate" type="date" class="filter-input" [(ngModel)]="filters.startDate" />
+    </div>
+    <div class="filter-group">
+      <label for="endDate">End Date</label>
+      <input id="endDate" type="date" class="filter-input" [(ngModel)]="filters.endDate" />
+    </div>
+    <div class="filter-group">
+      <label for="status">Status</label>
+      <div class="select-wrapper">
+        <select id="status" class="filter-input" [(ngModel)]="filters.status">
+          <option [ngValue]="null">Filter by Status</option>
+          @for (status of orderStatusOptions; track status) {
+          <option [value]="status">{{ status }}</option>
+          }
+        </select>
+      </div>
+    </div>
+    <div class="filter-group-actions">
+      <button class="button-secondary" (click)="resetFilters()">Reset</button>
+      <button class="search-button" (click)="onSearchClick()">Search</button>
+    </div>
+  </div>
+
+  <div class="card table-card" @shellFadeIn>
+
+    @if (isLoading) {
+    <div class="loader-wrapper" @fade>
+      <div class="fancy-loader">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <span>Loading orders...</span>
+    </div>
+    }
+
+    @if (!isLoading && orders.length > 0) {
+    <div @fade>
+      <div class="table-container table-responsive">
+        <table class="data-table table table-dark table-hover align-middle">
+          <thead>
+            <tr>
+              <th class="col-id">Order ID</th>
+              <th class="col-date">Date</th>
+              <th class="col-customer">Customer</th>
+              <th class="col-amount">Amount</th>
+              <th class="col-status">Status</th>
+              <th class="col-actions">Actions</th>
+              <th class="col-expand" aria-label="Expand row"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (order of orders; track order.id) {
+            <tr class="order-row" (click)="toggleOrderExpansion(order.id)"
+              [class.expanded]="expandedOrderId === order.id">
+              <td data-label="ID">
+                <div class="id-cell">
+                  <span>#{{ order.id }}</span>
+                </div>
+              </td>
+              <td data-label="Date" [title]="order.createdAt | date:'full'">{{ order.createdAt | date:'MMM d, y' }}</td>
+              <td data-label="Customer">{{ order.customerName || 'N/A' }}</td>
+              <td data-label="Amount" class="col-amount-data">{{ order.totalAmount | currency:'INR' }}</td>
+              <td data-label="Status">
+                <span class="status-badge" [ngClass]="'status-' + order.orderStatus.toLowerCase()">{{ order.orderStatus
+                  }}</span>
+              </td>
+              <td data-label="Actions" class="actions-cell">
+                <div class="action-buttons-wrapper">
+                  @if (order.orderStatus === OrderStatusEnum.CREATED) {
+                  <button class="action-button edit" (click)="navigateToEditOrder($event, order)">Edit</button>
+                  <button class="action-button generate" (click)="openConfirmationModal($event, order, 'invoice')"
+                    [disabled]="actionLoadingId === order.id">
+                    @if (actionLoadingId === order.id && currentAction === 'invoice') { <div class="button-spinner">
+                    </div>
+                    }
+                    <span>Invoice</span>
+                  </button>
+                  <button class="action-button cancel" (click)="openConfirmationModal($event, order, 'cancel')"
+                    [disabled]="actionLoadingId === order.id">
+                    @if (actionLoadingId === order.id && currentAction === 'cancel') { <div class="button-spinner">
+                    </div>
+                    }
+                    <span>Cancel</span>
+                  </button>
+                  }
+                  @if (order.orderStatus === OrderStatusEnum.INVOICED) {
+                  <button class="action-button download" (click)="onDownloadInvoice($event, order.id)"
+                    [disabled]="actionLoadingId === order.id">
+                    @if (actionLoadingId === order.id) { <div class="button-spinner"></div> }
+                    <span>Download</span>
+                  </button>
+                  }
+                </div>
+              </td>
+              <td class="expand-cell">
+                <span class="expand-indicator" aria-hidden="true"></span>
+              </td>
+            </tr>
+            <tr class="details-row" [class.expanded]="expandedOrderId === order.id">
+              <td [attr.colspan]="7">
+                <div class="details-content">
+                  <h4>Order Items ({{ order.orderItemDataList.length }})</h4>
+                  <table class="details-table">
+                    <thead>
+                      <tr>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Selling Price</th>
+                        <th>Subtotal</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (item of order.orderItemDataList; track item.id) {
+                      <tr>
+                        <td>{{ item.productName }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.sellingPrice | currency:'INR' }}</td>
+                        <td class="subtotal-cell">{{ item.quantity * item.sellingPrice | currency:'INR' }}</td>
+                      </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (paginationData && paginationData.totalPages > 1) {
+      <div class="pagination-controls">
+        <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 0">&laquo; Prev</button>
+        <span class="page-info">Page {{ currentPage + 1 }} of {{ paginationData.totalPages }}</span>
+        <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage + 1 >= paginationData.totalPages">Next
+          &raquo;</button>
+      </div>
+      }
+    </div>
+    }
+
+    @if (!isLoading && orders.length === 0) {
+    <div class="loader-wrapper" @fade>
+      <div class="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+          <path d="M3 6h18" />
+          <path d="M16 10a4 4 0 0 1-8 0" />
+        </svg>
+        <h2 class="mt-3">No Orders Found</h2>
+      </div>
+    </div>
+    }
+
+  </div> </div>
+
+@if (isConfirmModalVisible) {
+<div class="modal-backdrop" [class.closing]="isModalClosing" (click)="closeConfirmationModal()">
+  <div class="modal-content confirmation" (click)="$event.stopPropagation()" [class.closing]="isModalClosing">
+    <div class="modal-header">
+      <h2>Confirm Action</h2>
+      <button class="close-button" (click)="closeConfirmationModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>{{ confirmModalText }}</p>
+    </div>
+    <div class="modal-footer">
+      <button class="button-secondary" (click)="closeConfirmationModal()">No, go back</button>
+      <button class="button-primary" [ngClass]="'confirm-' + confirmModalAction" (click)="confirmStatusChange()">
+        Yes, {{ confirmModalAction }}
+      </button>
+    </div>
+  </div>
+</div>
+}

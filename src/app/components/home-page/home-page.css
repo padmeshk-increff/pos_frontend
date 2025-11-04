@@ -1,0 +1,192 @@
+/* Styles for the Dashboard / Home Page */
+
+/* Inherit global styles */
+.dashboard-stage {
+  position: relative;
+  /* Give it a minimum height to prevent the whole page from "jumping" */
+  min-height: 70vh; 
+}
+
+.loader-wrapper,
+.content-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+/* Style the loader-wrapper to center its contents,
+  just like the old .loading-state did.
+*/
+.loader-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 5rem; /* Position it down from the top */
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.dashboard-container{
+  position:relative;
+}
+
+.dashboard-container h1 {
+  margin-bottom: 2.5rem !important;
+}
+
+/* --- Loading State --- */
+.loading-state.large {
+  padding: 6rem 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.loading-state.large span { margin-top: 1rem; font-size: 1.1rem; }
+
+/* --- KPI Grid --- */
+.kpi-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem; margin-bottom: 2.5rem;
+}
+
+.kpi-card {
+  background: var(--card-bg); border-radius: 12px; padding: 25px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2); border: 1px solid var(--border-color);
+  display: flex; flex-direction: column; gap: 8px;
+}
+
+.kpi-header {
+  display: flex; justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.kpi-title {
+  font-size: 1rem; font-weight: 500; color: var(--text-secondary);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+.kpi-icon {
+  width: 24px; height: 24px;
+  fill: var(--text-secondary);
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.kpi-value {
+  font-size: 2.5rem; font-weight: 700; color: var(--text-primary);
+  line-height: 1.1; margin-bottom: 5px;
+}
+
+.kpi-comparison {
+  display: flex; align-items: center; gap: 6px; font-size: 0.9rem; font-weight: 500;
+}
+
+.kpi-change-icon { font-size: 1.1rem; }
+
+.kpi-comparison.positive { color: var(--success-color); }
+.kpi-comparison.negative { color: var(--danger-color); }
+.kpi-comparison.neutral { color: var(--text-secondary); }
+
+.kpi-change-label { color: var(--text-secondary); opacity: 0.8; }
+
+/* --- Grid Layout for Actions & Alerts --- */
+.actions-alerts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 1.5rem;
+  align-items: start; /* Keep items aligned to top */
+}
+
+/* Default span for all items */
+.actions-alerts-grid > * {
+    grid-column: span 1;
+    max-width: none; /* Reset max-width */
+    justify-self: stretch; /* Default alignment */
+}
+
+
+
+
+/* --- Action Card (Simplified) --- */
+.action-card {
+  /* Inherit base .card styles */
+  padding: 15px 15px; /* Adjust padding as needed */
+  text-align: center; cursor: pointer;
+  color: var(--text-secondary); font-weight: 500; font-size: 0.9rem; /* Increased font size */
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 10px;
+  position: relative;
+  /* --- FIX: Updated transition --- */
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+  appearance: button;
+  /* --- FIX: Set up for background-clip border --- */
+  border: 1px solid var(--border-color) !important; /* Base border color */
+  background: var(--card-bg) !important;
+  background-clip: padding-box; /* This is key! Background only fills padding area */
+  border-radius: 12px !important;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
+  min-height: 160px; /* Keep minimum height */
+}
+
+/* --- REMOVED ::before, ::after, and animation rules --- */
+
+/* --- Simple Gradient Border on Hover --- */
+.action-card:hover {
+  transform: translateY(-4px);
+  color: var(--text-primary);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3) !important;
+
+  /* --- FIX: Set border-color to transparent and apply gradient to background --- */
+  /* This works because background-clip is 'padding-box', so the background
+     (which is now the gradient) fills *behind* the padding, and the
+     transparent border lets it show through. */
+  border-color: var(--accent-hover) !important;
+  
+}
+
+
+/* Icon Wrapper and SVG */
+.action-icon-wrapper {
+  width: 48px; height: 48px; /* Increased size */
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s ease;
+  position: relative; /* Keep relative */
+}
+.action-icon-wrapper svg {
+  width: 24px; height: 24px; /* Increased size */
+  fill: currentColor; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.action-icon-wrapper.order { background-color: rgba(66, 153, 225, 0.2); color: var(--accent-color); }
+.action-icon-wrapper.product { background-color: rgba(56, 161, 105, 0.2); color: var(--success-color); }
+.action-icon-wrapper.report { background-color: rgba(237, 137, 54, 0.2); color: #f6ad55; }
+.action-icon-wrapper.client { background-color: rgba(167, 139, 250, 0.2); color: #a78bfa; }
+
+.action-card:hover .action-icon-wrapper { transform: scale(1.1); }
+
+.action-icon-wrapper.alert { background-color: rgba(229, 62, 62, 0.2); color: var(--danger-color); }
+
+.action-card:hover .action-icon-wrapper { transform: scale(1.1); }
+
+.action-card-value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-top:auto;
+}
+.action-card-value.danger {
+  color: var(--danger-color);
+  vertical-align: middle;
+}
+.action-card-value.success {
+  color: var(--success-color);
+}
+
+
+
+/* --- Empty State (Error) --- */
+.empty-state h2 { color: var(--text-primary); margin-bottom: 0.5rem; }
+.empty-state p { font-size: 1rem; }
+

@@ -1,0 +1,148 @@
+/* Styles specific to the Report Page */
+
+/* Inherit global styles for page-container, header-row, card etc. */
+
+.reports-card {
+  padding: 40px; /* More padding for distinct sections */
+}
+
+.report-section {
+  margin-bottom: 2.5rem; /* Space below each section */
+}
+.report-section:last-child {
+  margin-bottom: 0; /* No space after the last section */
+}
+
+.report-title {
+  font-size: 1.5rem; /* Slightly smaller than page title */
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* --- FIX: Add margin-top to second section's title for separation --- */
+.report-section:nth-child(2) .report-title {
+   margin-top: 2.5rem; /* Creates space equivalent to removed hr */
+}
+
+.report-description {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  max-width: 800px; /* Limit description width */
+}
+
+.report-controls {
+  display: flex;
+  flex-direction: column; /* Stack controls vertically by default */
+  gap: 1.5rem;
+}
+
+/* On wider screens, place date inputs and button side-by-side */
+@media (min-width: 768px) {
+  .report-controls {
+    flex-direction: row;
+    align-items: flex-end; /* Align button bottom with inputs */
+    justify-content: space-between;
+  }
+}
+
+.date-inputs {
+  display: flex;
+  gap: 1.5rem; /* Space between date inputs */
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.filter-group {
+  flex: 1 1 200px; /* Allow inputs to grow but have a base size */
+  min-width: 180px; /* Prevent inputs becoming too small */
+}
+
+.filter-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.filter-input {
+  /* Inherits styles from global .form-control */
+  width: 100%;
+}
+
+/* --- NEW: Style Calendar Icon for Date Inputs --- */
+.filter-input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1); /* Inverts the default black icon to white */
+  opacity: 0.7; /* Make it slightly subtle */
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.filter-input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1; /* Full white on hover */
+}
+/* --- END NEW STYLE --- */
+
+
+.download-button {
+  /* Use primary button styles but adjust padding/height */
+  padding: 10px 20px;
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all var(--transition-speed) ease;
+  display: inline-flex; /* Use inline-flex for icon alignment */
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap; /* Prevent button text wrapping */
+  /* Ensure height matches inputs if needed */
+   height: calc(1.5em + 0.75rem + 2px + 2px); /* Match default BS input height */
+}
+
+.download-button:hover:not(:disabled) {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
+}
+
+.download-button:disabled {
+  background-color: #4a5568 !important; /* Use disabled color */
+  cursor: not-allowed;
+  opacity: 0.65;
+  box-shadow: none;
+  transform: none;
+}
+
+.download-button svg {
+  flex-shrink: 0; /* Prevent icon shrinking */
+}
+
+/* Spinner inside button */
+.button-spinner.small {
+  width: 18px;
+  height: 18px;
+  border-width: 2px; /* Smaller border */
+  border-color: rgba(255, 255, 255, 0.3); /* Lighter border color */
+  border-top-color: white; /* Spinner color */
+  margin: 0; /* Remove auto margin */
+  /* --- ADDED: Animation for spinner --- */
+  animation: spin 1s linear infinite;
+}
+/* --- ADDED: spin keyframes --- */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
+/* Adjust layout specifically for inventory section if needed */
+.inventory-controls {
+  justify-content: flex-start; /* Align button left if desired */
+}
+

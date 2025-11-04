@@ -1,0 +1,612 @@
+/*
+ * Component-specific styles for Client Management page.
+ * Leverages global styles for theme, buttons, modals etc.
+ */
+
+/* --- Controls Card Specifics --- */
+.controls-card {
+  /* Use grid for flexible layout */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  /* Responsive columns */
+  gap: 1.5rem;
+  align-items: end;
+  padding: 30px;
+}
+
+/* On larger screens, use two columns */
+@media (min-width: 768px) {
+  .controls-card {
+    /* Adjust grid to have filter take up space, and actions align right */
+    grid-template-columns: 1fr auto;
+  }
+}
+
+.filter-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.search-input,
+.filter-input {
+  width: 100%;
+  max-width: 450px;
+  /* Inherits height from global .form-control */
+  height: 43.6px;
+}
+
+/* --- NEW: Filter Action Buttons --- */
+.filter-group-actions {
+  flex-shrink: 0;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+}
+
+/* Copied from order-page.css for consistency */
+.filter-group-actions .button-secondary {
+  padding: 10px 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 43.6px;
+  /* Match input height */
+}
+
+.search-button {
+  padding: 10px 20px;
+  background-color: var(--accent-color);
+  color: white;
+  border: 1px solid var(--accent-color);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all var(--transition-speed) ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 43.6px;
+  /* Match input height */
+}
+
+.search-button:hover {
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
+}
+
+/* --- Table Styles for Consistency --- */
+.table-container {
+  position: relative;
+  min-height: 320px;
+  box-sizing: border-box;
+  transition: min-height 160ms ease;
+  padding: 8px 0;
+}
+
+.table-container.loading .data-table {
+  opacity: 0.45;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+
+.loader-overlay,
+.empty-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  pointer-events: auto;
+  background: rgba(0, 0, 0, 0.02);
+  padding: 1.5rem;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom:0;
+}
+
+.data-table th.col-client-id {
+  width: 15%;
+}
+
+.data-table th.col-client-name {
+  width: auto;
+}
+
+.data-table th.col-actions {
+  width: 150px;
+}
+
+.data-table th {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+.data-table td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+  color: var(--text-secondary);
+  white-space: normal;
+  word-break: break-word;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+/* Alignment rules */
+.data-table th.col-client-id,
+.data-table td[data-label="ID"] {
+  text-align: left;
+}
+
+.data-table th.col-client-name,
+.data-table td[data-label="Name"] {
+  text-align: left;
+}
+
+.data-table th.col-actions,
+.data-table td.actions-cell {
+  text-align: right;
+}
+
+/* Table Row Hover Effect */
+.data-table tbody tr {
+  transition: background-color var(--transition-speed);
+}
+
+.data-table tbody tr:hover {
+  background-color: var(--row-hover);
+}
+
+
+/* Action button styles (base) */
+.action-button {
+  padding: 6px 12px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 1.5;
+  vertical-align: middle;
+}
+
+.action-button.edit:hover:not(:disabled) {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+}
+
+/* --- Styles for Inline Editing --- */
+
+.inline-edit-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.inline-edit-input {
+  padding: calc(6px) 0.75rem !important;
+  font-size: inherit !important;
+  height: auto !important;
+  line-height: 1.5 !important;
+  background-color: var(--input-bg) !important;
+  border: 1px solid var(--accent-color) !important;
+  color: var(--text-primary) !important;
+  box-shadow: none !important;
+  flex-grow: 1;
+  max-width: 400px;
+  box-sizing: border-box;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0;
+}
+
+.inline-edit-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.inline-edit-actions .action-button {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  height: auto;
+  line-height: 1.5;
+  vertical-align: middle;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.inline-edit-actions .action-button.save {
+  border-color: var(--success-color);
+  color: var(--success-color);
+  background-color: transparent;
+}
+
+.inline-edit-actions .action-button.save:hover:not(:disabled) {
+  background-color: var(--success-color);
+  color: white;
+  border-color: var(--success-color);
+}
+
+.inline-edit-actions .action-button.save:active:not(:disabled) {
+  background-color: var(--success-hover);
+}
+
+
+.inline-edit-actions .action-button.cancel {
+  border-color: var(--danger-color);
+  color: var(--danger-color);
+  background-color: transparent;
+}
+
+.inline-edit-actions .action-button.cancel:hover:not(:disabled) {
+  background-color: var(--danger-color);
+  color: white;
+  border-color: var(--danger-color);
+}
+
+.inline-edit-actions .action-button.cancel:active:not(:disabled) {
+  background-color: var(--danger-hover);
+}
+
+.inline-edit-actions .action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: transparent !important;
+  color: var(--text-secondary) !important;
+  border-color: var(--border-color) !important;
+  box-shadow: none !important;
+}
+
+
+/* Disable Edit button visually when another row is being edited */
+.action-button.edit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: transparent !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+
+/* --- Modal & Empty State Styles --- */
+.modal-body .form-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.modal-body input[type="text"] {
+  width: 100%;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: var(--text-secondary);
+}
+
+.empty-state.no-results {
+  padding: 2rem 1rem;
+}
+
+.empty-state-icon {
+  color: var(--border-color);
+  margin-bottom: 1.5rem;
+}
+
+.empty-state h2 {
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  font-size: 1rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleDown {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  to {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
+  animation: fadeIn var(--transition-speed) ease-out;
+}
+
+.modal-content {
+  background: var(--card-bg);
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 15px 40px var(--shadow-color);
+  animation: scaleUp var(--transition-speed) ease-out;
+}
+
+.modal-backdrop.closing {
+  animation: fadeOut var(--transition-speed) ease-in forwards;
+}
+
+.modal-content.closing {
+  animation: scaleDown var(--transition-speed) ease-in forwards;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 15px;
+  margin-bottom: 25px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 2.2rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-speed), transform var(--transition-speed);
+}
+
+.close-button:hover {
+  color: var(--text-primary);
+  transform: rotate(90deg);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+/* --- NEW: Pagination Controls --- */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  color: var(--text-secondary);
+}
+
+.pagination-controls button {
+  padding: 8px 16px;
+  background-color: var(--border-color);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all var(--transition-speed) ease;
+}
+
+.pagination-controls button:hover:not(:disabled) {
+  background-color: #6b7280;
+}
+
+.pagination-controls button:disabled {
+  background-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-weight: 600;
+}
+
+/* --- ADDED: Base Spinner Styles --- */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid var(--border-color);
+  border-top: 5px solid var(--accent-color);
+  border-radius: 50%;
+  margin: 0 auto 1.5rem auto;
+  animation: spin 1s linear infinite;
+}
+
+.loader-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  /* This ensures the card has height while loading/empty */
+  min-height: 400px;
+  box-sizing: border-box;
+}
+
+/* This rule can now be simpler */
+.empty-state {
+  text-align: center;
+  color: var(--text-secondary);
+  /* Remove padding, as .loader-wrapper handles spacing */
+  padding: 0;
+}
+
+.empty-state.no-results {
+  padding: 0;
+}
+
+/* ==========================================================================
+   Additional overlay + skeleton rules (for skeleton -> loader -> content)
+   ========================================================================== */
+
+/* Skeleton overlay sits below the loader overlay (z-index 4) */
+.skeleton-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1rem;
+  pointer-events: none;
+  background: rgba(0,0,0,0.01);
+}
+
+/* inner wrapper constraining skeleton width */
+.skeleton-inner {
+  width: 100%;
+  max-width: 1200px;
+}
+
+/* each skeleton row mimics row height (tweak height if necessary) */
+.skeleton-row {
+  height: 48px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
+  background-size: 200% 100%;
+  margin: 10px 0;
+  animation: skeletonShimmer 1.2s linear infinite;
+}
+
+/* shimmer */
+@keyframes skeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* loader overlay (on top of skeleton) - existing visual preserved */
+.loader-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  pointer-events: auto;
+  background: rgba(0, 0, 0, 0.03);
+  padding: 1.5rem;
+}
+
+/* empty overlay sits above skeleton but under loader by z-index */
+.empty-overlay {
+  position: absolute;
+  inset: 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index: 4;
+  padding: 1.5rem;
+  pointer-events: auto;
+  background: rgba(0,0,0,0.01);
+}
+
+/* small tweak so table header remains visible and body reserved space */
+.data-table thead th {
+  background: transparent;
+}
+
+/* smooth fade transitions (for hide/show overlays) */
+.skeleton-overlay, .loader-overlay, .empty-overlay {
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+.skeleton-overlay[hidden], .loader-overlay[hidden], .empty-overlay[hidden] {
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+}

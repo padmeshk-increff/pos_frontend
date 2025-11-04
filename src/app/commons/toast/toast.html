@@ -1,0 +1,19 @@
+<!-- This outer container positions the stack of toasts on the screen -->
+<div class="toast-stack-container">
+  
+  <!-- 
+    We use the async pipe to subscribe to the toasts$ observable.
+    The @for loop then renders each toast message in the array.
+  -->
+  @for (toast of toasts$ | async; track toast.id) {
+    <div 
+      class="toast-container" 
+      [ngClass]="toast.type"
+      [class.hiding]="toast.closing">
+      <span>{{ toast.message }}</span>
+      <button class="close-btn" (click)="closeToast(toast.id)">&times;</button>
+    </div>
+  }
+
+</div>
+

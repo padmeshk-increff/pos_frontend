@@ -1,0 +1,78 @@
+<nav class="navbar">
+  <a class="nav-brand" routerLink="/">
+    <!-- <i class="icon-pos"></i> --> <!-- Optional icon -->
+    <span>PoS App</span>
+  </a>
+
+  <!-- Desktop Navigation Links -->
+  <div class="nav-links desktop-nav-links">
+    <a routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">Dashboard</a>
+    <a routerLink="/orders" routerLinkActive="active-link">Orders</a>
+    <a routerLink="/products" routerLinkActive="active-link">Products</a>
+    <a routerLink="/clients" routerLinkActive="active-link">Clients</a>
+    @if (userRole === 'SUPERVISOR') {
+      <a routerLink="/reports" routerLinkActive="active-link">Reports</a>
+    }
+  </div>
+
+  <!-- User Section: Avatar + NEW Burger Menu -->
+  <div class="user-section">
+    @if (currentUser) {
+      <!-- Profile Avatar Button -->
+      <button class="profile-avatar" (click)="toggleProfileDropdown($event)">
+        {{ getInitials(userEmail) }}
+      </button>
+
+      <!-- Profile Dropdown Menu -->
+      @if (isProfileDropdownOpen) {
+        <div class="profile-dropdown" [@dropdownAnimation] (click)="$event.stopPropagation()">
+          <div class="dropdown-header">
+            <div class="dropdown-email">{{ userEmail }}</div>
+            <div class="dropdown-role" [class.supervisor]="userRole === 'SUPERVISOR'" [class.operator]="userRole === 'OPERATOR'">
+              {{ getRoleDisplayName(userRole!) }}
+            </div>
+          </div>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item logout" (click)="logout()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2.146a.5.5 0 0 1-1 0V5H2v6h6.5v-2.146a.5.5 0 0 1 1 0v2.146z"/>
+              <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
+            </svg>
+            Logout
+          </button>
+        </div>
+      }
+
+    } @else {
+       <div class="user-section-placeholder"></div>
+    }
+
+    <!-- NEW: Mobile Burger Menu Toggle Button -->
+    <button class="mobile-menu-toggle" (click)="toggleMobileMenu($event)">
+      @if (isMobileMenuOpen) {
+        <!-- Close Icon (X) -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      } @else {
+        <!-- Burger Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      }
+    </button>
+  </div>
+</nav>
+
+<!-- NEW: Mobile Navigation Links (Full-width dropdown) -->
+@if (isMobileMenuOpen) {
+  <div class="mobile-nav-links" [@mobileMenuAnimation] (click)="$event.stopPropagation()">
+    <!-- Add (click)="onMobileLinkClick()" to each link -->
+    <a routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" (click)="onMobileLinkClick()">Dashboard</a>
+    <a routerLink="/orders" routerLinkActive="active-link" (click)="onMobileLinkClick()">Orders</a>
+    <a routerLink="/products" routerLinkActive="active-link" (click)="onMobileLinkClick()">Products</a>
+    <a routerLink="/clients" routerLinkActive="active-link" (click)="onMobileLinkClick()">Clients</a>
+    @if (userRole === 'SUPERVISOR') {
+      <a routerLink="/reports" routerLinkActive="active-link" (click)="onMobileLinkClick()">Reports</a>
+    }
+  </div>
+}
+
+
+

@@ -1,0 +1,185 @@
+<div class="page-container">
+
+  <div class="header-row">
+    <h1>Client Management</h1>
+    <button class="header-button" (click)="openAddModal()">+ Add Client</button>
+  </div>
+
+  <div class="card controls-card" @shellFadeIn>
+    <div class="search-section filter-group">
+      <label for="clientSearchInput">Search Clients</label>
+      <input
+        type="text"
+        id="clientSearchInput"
+        class="search-input filter-input"
+        placeholder="Search by client name..."
+        [(ngModel)]="searchTerm"
+        (keyup.enter)="applyFilter()" />
+    </div>
+
+    <div class="filter-group-actions">
+      <button class="button-secondary" (click)="resetFilters()">Reset</button>
+      <button class="button-primary search-button" (click)="applyFilter()">Search</button>
+    </div>
+  </div>
+
+  <div class="card table-card" @shellFadeIn>
+    <!-- Table container: skeleton -> loader (fancy-loader) -> content overlays -->
+    <div
+      class="table-container table-responsive"
+      [class.loading]="showLoaderOverlay || isLoading"
+      role="region"
+      aria-live="polite"
+      [attr.aria-busy]="isLoading">
+
+      <!-- ALWAYS render the table to keep layout stable -->
+      <table class="data-table table table-dark table-hover align-middle" aria-label="Clients table">
+        <thead>
+          <tr>
+            <th class="col-client-id">Client ID</th>
+            <th class="col-client-name">Client Name</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (client of clients; track client.id) {
+            <tr>
+              <td data-label="ID">{{ client.id }}</td>
+
+              <td data-label="Name" [attr.colspan]="editingClientId === client.id ? 2 : null">
+                @if (editingClientId === client.id) {
+                  <div class="inline-edit-container">
+                    <input
+                      type="text"
+                      class="form-control form-control-sm inline-edit-input"
+                      [(ngModel)]="editClientName"
+                      (keyup.enter)="saveEdit(client)"
+                      (keyup.escape)="cancelEdit()"
+                      cdkFocusInitial />
+                    <div class="inline-edit-actions">
+                      <button class="action-button save" (click)="saveEdit(client)" [disabled]="isSaving">Save</button>
+                      <button class="action-button cancel" (click)="cancelEdit()" [disabled]="isSaving">Cancel</button>
+                    </div>
+                  </div>
+                } @else {
+                  <span>{{ client.clientName }}</span>
+                }
+              </td>
+
+              @if (editingClientId !== client.id) {
+                <td data-label="Actions" class="actions-cell">
+                  <button class="action-button edit"
+                          (click)="startEdit(client)"
+                          [disabled]="isSaving || editingClientId !== null">
+                    Edit
+                  </button>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <!-- 1) Skeleton overlay (shown immediately when fetch starts) -->
+      @if (showSkeleton) {
+        <div class="skeleton-overlay" aria-hidden="true">
+          <div class="skeleton-inner">
+            @for (i of [0,1,2,3,4]; track i) {
+              <div class="skeleton-row"></div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- 2) Loader overlay using the SAME fancy-loader markup from the Order page -->
+      @if (showLoaderOverlay) {
+        <div class="loader-overlay" aria-live="polite" role="status">
+          <div class="loader-wrapper" @fade>
+            <div class="fancy-loader" aria-hidden="true">
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+            </div>
+            <span>Loading clients...</span>
+          </div>
+        </div>
+      }
+
+      <!-- 3) No-results overlay -->
+      @if (!isLoading && !showSkeleton && clients.length === 0 && activeSearchTerm) {
+        <div class="empty-overlay">
+          <div class="empty-state no-results">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+              class="empty-state-icon" aria-hidden="true">
+              <path d="M21 8v13H3V8" />
+              <path d="M1 3h22v5H1z" />
+              <path d="M10 12h4" />
+            </svg>
+            <h2>No Results Found</h2>
+            <p>No clients match your search for "{{ activeSearchTerm }}".</p>
+          </div>
+        </div>
+      }
+
+      <!-- 4) Empty overlay (no clients at all) -->
+      @if (!isLoading && !showSkeleton && clients.length === 0 && !activeSearchTerm) {
+        <div class="empty-overlay">
+          <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+              class="empty-state-icon" aria-hidden="true">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <line x1="19" x2="19" y1="8" y2="14" />
+              <line x1="22" x2="16" y1="11" y2="11" />
+            </svg>
+            <h2>No Clients Found</h2>
+            <p>Click "+ Add Client" to get started.</p>
+          </div>
+        </div>
+      }
+
+    </div> <!-- .table-container -->
+
+    <!-- Pagination controls -->
+    @if (paginationData && paginationData.totalPages > 1) {
+      <div class="pagination-controls">
+        <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 0">&laquo; Prev</button>
+        <span class="page-info">Page {{ currentPage + 1 }} of {{ paginationData.totalPages }}</span>
+        <button (click)="goToPage(currentPage + 1)"
+          [disabled]="!paginationData || currentPage + 1 >= paginationData.totalPages">Next &raquo;</button>
+      </div>
+    }
+
+  </div> <!-- .card.table-card -->
+
+  <!-- ADD MODAL (unchanged) -->
+  @if (isAddModalVisible) {
+    <div class="modal-backdrop" [class.closing]="isModalClosing" (mousedown)="closeModalOnBackdropClick($event, 'add')">
+      <div class="modal-content" (click)="$event.stopPropagation()" [class.closing]="isModalClosing">
+        <div class="modal-header">
+          <h2>Add New Client</h2>
+          <button class="close-button" (click)="closeAddModal()" [disabled]="isSaving">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="newClientName">Client Name</label>
+            <input type="text" id="newClientName" [(ngModel)]="newClient.clientName" placeholder="e.g., Global Imports LLC" (keyup.enter)="addClient()">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="button-secondary" (click)="closeAddModal()" [disabled]="isSaving">Cancel</button>
+          <button type="button" class="button-success" (click)="isSaving || addClient()" [attr.disabled]="isSaving ? true : null" [class.is-saving]="isSaving" [attr.aria-busy]="isSaving ? 'true' : 'false'">
+            @if (isSaving) {
+              <span class="button-spinner small" aria-hidden="true"></span> Adding...
+            } @else {
+              Add Client
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

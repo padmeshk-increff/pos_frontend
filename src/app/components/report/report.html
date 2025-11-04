@@ -1,0 +1,68 @@
+<!-- Main container -->
+<div class="page-container">
+
+  <!-- Page Header -->
+  <div class="header-row">
+    <h1>Reports</h1>
+    <!-- No action button needed here usually -->
+  </div>
+
+  <!-- Reports Card -->
+  <div class="card reports-card">
+
+    <!-- Sales Report Section -->
+    <div class="report-section">
+      <h2 class="report-title">Sales Report</h2>
+      <p class="report-description">
+        Download a detailed breakdown of sales performance within a selected date range.
+        Includes summary KPIs, daily revenue totals, and product performance metrics.
+      </p>
+      <div class="report-controls">
+        <div class="date-inputs">
+          <div class="filter-group">
+            <label for="salesStartDate">Start Date</label>
+            <input id="salesStartDate" type="date" class="filter-input" [(ngModel)]="startDate" />
+          </div>
+          <div class="filter-group">
+            <label for="salesEndDate">End Date</label>
+            <input id="salesEndDate" type="date" class="filter-input" [(ngModel)]="endDate" />
+          </div>
+        </div>
+        <button class="download-button" (click)="downloadSalesReport()" [disabled]="isDownloadingSales || !startDate || !endDate">
+           @if (isDownloadingSales) {
+            <div class="button-spinner small"></div> <!-- Small spinner -->
+            <span>Generating...</span>
+           } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"> <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+            <span>Download Sales Report (TSV)</span>
+           }
+        </button>
+      </div>
+    </div>
+
+    <!-- Divider REMOVED -->
+    <!-- <hr class="report-divider"> -->
+
+    <!-- Inventory Report Section -->
+    <div class="report-section">
+      <!-- Margin added via CSS -->
+      <h2 class="report-title">Inventory Report</h2>
+      <p class="report-description">
+        Download a snapshot of current inventory levels, values, and stock status for all products.
+      </p>
+      <div class="report-controls inventory-controls"> <!-- Simplified controls -->
+        <button class="download-button" (click)="downloadInventoryReport()" [disabled]="isDownloadingInventory">
+           @if (isDownloadingInventory) {
+             <div class="button-spinner small"></div> <!-- Small spinner -->
+             <span>Generating...</span>
+           } @else {
+             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"> <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+             <span>Download Inventory Report (TSV)</span>
+           }
+        </button>
+      </div>
+    </div>
+
+  </div> <!-- End Card -->
+</div>
+

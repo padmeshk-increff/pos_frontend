@@ -1,0 +1,369 @@
+<div class="page-container">
+
+  <div class="header-row">
+    <h1>Product Management</h1>
+    <div class="header-actions">
+      @if(userRole === RoleEnum.SUPERVISOR){
+      <button class="header-button secondary" (click)="openUploadModal('product')">Upload Products</button>
+      <button class="header-button secondary" (click)="openUploadModal('inventory')">Upload Inventory</button>
+      }
+      <button class="header-button" (click)="openAddModal()">+ Add Product</button>
+    </div>
+  </div>
+
+  <!-- Filter Controls Card -->
+  <div class="card controls-card" @shellFadeIn>
+    <div class="filter-grid">
+      <!-- Search Term -->
+      <div class="filter-group">
+        <label for="searchTerm">Search Term</label>
+        <input id="searchTerm" type="text" class="filter-input" placeholder="Name, barcode, client..."
+          [(ngModel)]="filters.searchTerm" (keyup.enter)="applyFilters()" />
+      </div>
+
+      <!-- Client Name -->
+      <div class="filter-group">
+        <label for="clientName">Client Name</label>
+        <input id="clientName" type="text" class="filter-input" placeholder="e.g., Global Imports"
+          [(ngModel)]="filters.clientName" (keyup.enter)="applyFilters()" />
+      </div>
+
+      <!-- Category -->
+      <div class="filter-group">
+        <label for="category">Category</label>
+        <input id="category" type="text" class="filter-input" placeholder="e.g., Electronics"
+          [(ngModel)]="filters.category" (keyup.enter)="applyFilters()" />
+      </div>
+
+      <!-- Min MRP -->
+      <div class="filter-group">
+        <label for="minMrp">Min MRP</label>
+        <input id="minMrp" type="text" class="filter-input" placeholder="e.g., 100" inputmode="decimal"
+          [ngModel]="filters.minMrp" (ngModelChange)="validateMrpInput('minMrp', $event)"
+          (keyup.enter)="applyFilters()" />
+      </div>
+
+      <!-- Max MRP -->
+      <div class="filter-group">
+        <label for="maxMrp">Max MRP</label>
+        <input id="maxMrp" type="text" class="filter-input" placeholder="e.g., 500" inputmode="decimal"
+          [ngModel]="filters.maxMrp" (ngModelChange)="validateMrpInput('maxMrp', $event)"
+          (keyup.enter)="applyFilters()" />
+      </div>
+
+      <!-- Filter Actions -->
+      <div class="filter-group-actions">
+        <button class="button-secondary reset-button" (click)="resetFilters()">Reset</button>
+        <button class="button-primary search-button" (click)="applyFilters()">Search</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Product Table Card -->
+  <div class="card table-card" @shellFadeIn>
+
+    <!-- 1. Loader State -->
+    @if (isLoading) {
+    <div class="loader-wrapper" @fade>
+      <div class="fancy-loader">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <span>Loading products...</span>
+    </div>
+    }
+
+    <!-- 2. Content State (Table + Pagination) -->
+    @if (!isLoading && products.length > 0) {
+    <div @fade>
+      <div class="table-container">
+        <table class="data-table product-table">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Product Name</th>
+              <th>Client</th>
+              <th>Barcode</th>
+              <th>MRP</th>
+              <th>Inventory</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (product of products; track trackProductById($index, product)) {
+            <tr>
+              <td>
+                <img [src]="product.imageUrl || 'https://placehold.co/100x100/2d3748/a0aec0?text=No+Image'"
+                  alt="{{ product.name }}" class="product-image" />
+              </td>
+              <td data-label="Product">{{ product.name }}</td>
+              <td data-label="Client">{{ product.clientName }}</td>
+              <td data-label="Barcode">{{ product.barcode }}</td>
+              <td data-label="MRP">{{ product.mrp | currency:'INR' }}</td>
+              <td data-label="Inventory">
+                <span class="inventory-badge" [ngClass]="{
+                      'high-stock': product.quantity > 50,
+                      'low-stock': product.quantity > 0 && product.quantity <= 50,
+                      'out-of-stock': product.quantity === 0 || product.quantity === null
+                    }">{{ product.quantity ?? 'N/A' }}</span>
+              </td>
+              <td class="actions-cell">
+                <button class="action-button edit" (click)="openEditModal(product)">Edit</button>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (paginationData && paginationData.totalPages > 1) {
+      <div class="pagination-controls">
+        <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 0">&laquo; Prev</button>
+        <span class="page-info">Page {{ currentPage + 1 }} of {{ paginationData.totalPages }}</span>
+        <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage + 1 >= paginationData.totalPages">Next
+          &raquo;</button>
+      </div>
+      }
+    </div>
+    }
+
+    <!-- 3. Empty State (Initial, no products) -->
+    @if (!isLoading && products.length === 0 && paginationData && paginationData.totalElements === 0) {
+    <div class="loader-wrapper" @fade>
+      <div class="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1">
+          <path d="M21.5 12H19c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h2.5" />
+          <path d="m22 12-3-3-3 3" />
+          <path d="M11 2a3 3 0 0 1 3 3v1H8V5a3 3 0 0 1 3-3Z" />
+          <path d="M11 22a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2" />
+          <path d="M17 22a2 2 0 0 1 2-2h3" />
+          <path d="M2 11.45V18a2 2 0 0 0 2 2h2" />
+          <path d="M20 18h2a2 2 0 0 0 2-2v-5.59" />
+        </svg>
+        <h2>No Products Found</h2>
+        <p>Click "+ Add Product" or "Upload Products" to get started.</p>
+      </div>
+    </div>
+    }
+
+    <!-- 4. Empty State (No search results) -->
+    @if (!isLoading && products.length === 0 && paginationData && paginationData.totalElements > 0) {
+    <div class="loader-wrapper" @fade>
+      <div class="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="empty-state-icon">
+          <path d="M21 8v13H3V8" />
+          <path d="M1 3h22v5H1z" />
+          <path d="M10 12h4" />
+        </svg>
+        <h2>No Products Found</h2>
+        <p>No products match your current filters. Try adjusting your search.</p>
+      </div>
+    </div>
+    }
+
+  </div>
+</div>
+
+<!-- Add/Edit Modals -->
+@if (isEditModalVisible) {
+<div class="modal-backdrop" [class.closing]="isModalClosing" (mousedown)="closeModalOnBackdropClick($event, 'edit')">
+  <div class="modal-content" [class.closing]="isModalClosing">
+    @if (productToEdit) {
+    <div class="modal-header">
+      <h2>Edit Product</h2>
+      <button class="close-button" (click)="closeEditModal()" [disabled]="isSaving">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="editProductName">Product Name</label>
+        <input type="text" id="editProductName" class="form-control" [(ngModel)]="productToEdit.name"
+          (keyup.enter)="saveProductChanges()" disabled>
+      </div>
+      <div class="form-group">
+        <label for="editProductCategory">Category</label>
+        <input type="text" id="editProductCategory" class="form-control" [(ngModel)]="productToEdit.category"
+          (keyup.enter)="saveProductChanges()" disabled>
+      </div>
+      <div class="form-group">
+        <label for="editProductMrp">MRP</label>
+        <input type="text" id="editProductMrp" class="form-control"
+               [ngModel]="productToEdit.mrp"
+               (keydown)="onDecimalKeyDown($event)"
+               (ngModelChange)="onEditMrpChange($event)"
+               inputmode="decimal"
+               (keyup.enter)="saveProductChanges()">
+      </div>
+      <div class="form-group">
+        <label for="editProductInventory">Inventory</label>
+        <input type="text" id="editProductInventory" class="form-control"
+               [ngModel]="productToEdit.quantity"
+               (keydown)="onNumericKeyDown($event)"
+               (ngModelChange)="onEditInventoryChange($event)"
+               inputmode="numeric"
+               (keyup.enter)="saveProductChanges()">
+      </div>
+      <div class="form-group">
+        <label for="editProductBarcode">Barcode</label>
+        <input type="text" id="editProductBarcode" class="form-control" [(ngModel)]="productToEdit.barcode" disabled>
+      </div>
+      <div class="form-group">
+        <label for="editProductClient">Client</label>
+        <input type="text" id="editProductClient" class="form-control" [(ngModel)]="productToEdit.clientName" disabled>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="button-secondary" (click)="closeEditModal()" [disabled]="isSaving">Cancel</button>
+      <button class="button-primary" (click)="saveProductChanges()" [disabled]="isSaving">{{ isSaving ? 'Saving...' :
+        'Save Changes' }}</button>
+    </div>
+    }
+  </div>
+</div>
+}
+@if (isAddModalVisible) {
+<div class="modal-backdrop" [class.closing]="isModalClosing" (mousedown)="closeModalOnBackdropClick($event, 'add')">
+  <div class="modal-content" [class.closing]="isModalClosing">
+    @if (newProduct) {
+    <div class="modal-header">
+      <h2>Add New Product</h2>
+      <button class="close-button" (click)="closeAddModal()" [disabled]="isSaving">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="newProductName">Product Name</label>
+        <input type="text" id="newProductName" class="form-control" [(ngModel)]="newProduct.name"
+          placeholder="e.g., KitKat" (keyup.enter)="addProduct()">
+      </div>
+      <div class="form-group">
+        <label for="newProductBarcode">Barcode</label>
+        <input type="text" id="newProductBarcode" class="form-control" [(ngModel)]="newProduct.barcode"
+          placeholder="e.g., 1234567890" (keyup.enter)="addProduct()">
+      </div>
+      <div class="form-group">
+        <label for="newProductCategory">Category</label>
+        <input type="text" id="newProductCategory" class="form-control" [(ngModel)]="newProduct.category"
+          placeholder="e.g., Chocolate" (keyup.enter)="addProduct()">
+      </div>
+      <div class="form-group">
+        <label for="newProductMrp">MRP</label>
+        <input type="text" id="newProductMrp" class="form-control"
+               [ngModel]="newProduct.mrp"
+               (keydown)="onDecimalKeyDown($event)"
+               (ngModelChange)="onNewMrpChange($event)"
+               placeholder="e.g., 10.00"
+               inputmode="decimal"
+               (keyup.enter)="addProduct()">
+      </div>
+      <div class="form-group">
+        <label for="newProductClientId">Client ID</label>
+        <input type="text" id="newProductClientId" class="form-control"
+               [ngModel]="newProduct.clientId"
+               (keydown)="onNumericKeyDown($event)"
+               (ngModelChange)="onNewClientIdChange($event)"
+               placeholder="e.g., 1"
+               inputmode="numeric"
+               (keyup.enter)="addProduct()">
+      </div>
+      <div class="form-group">
+        <label for="newProductImageUrl">Image URL (optional)</label>
+        <input type="url" id="newProductImageUrl" class="form-control" [(ngModel)]="newProduct.imageUrl"
+          placeholder="e.g., https://example.com/image.jpg" (keyup.enter)="addProduct()">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="button-secondary" (click)="closeAddModal()" [disabled]="isSaving">Cancel</button>
+      <button type="button" class="button-success" (click)="addProduct()" [disabled]="isSaving">
+        @if (isSaving) {
+        <div class="button-spinner small" aria-hidden="true"></div>
+        Adding...
+        } @else {
+        Add Product
+        }
+      </button>
+    </div>
+    }
+  </div>
+</div>
+}
+
+<!-- Upload Modals -->
+@if (isUploadModalVisible) {
+<div class="modal-backdrop" [class.closing]="isModalClosing" (mousedown)="closeModalOnBackdropClick($event, 'upload')">
+  <div class="modal-content upload-modal" [class.closing]="isModalClosing">
+    <div class="modal-header">
+      <h2>Upload {{ uploadType === 'product' ? 'Product Master' : 'Inventory' }} (TSV)</h2>
+      <button class="close-button" (click)="closeUploadModal()"
+        [disabled]="isUploadingProduct || isUploadingInventory">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>
+        Select a Tab-Separated Value (.tsv) file to upload.
+        <!-- UPDATED: Dynamically display headers -->
+        @if (uploadType === 'product') {
+        The file should contain columns: <strong>{{ productHeaders.join(', ') }}</strong>.
+        } @else {
+        The file should contain columns: <strong>{{ inventoryHeaders.join(', ') }}</strong>.
+        }
+        Any rows with errors will be skipped, and a report will be generated.
+      </p>
+
+      <!-- Sample Download Link -->
+      <div class="sample-download-container">
+        <button class="sample-download-link" (click)="downloadSampleTsv()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16">
+            <path
+              d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293V6.5z" />
+            <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 1.5L14 6h-4.5V1.5z" />
+          </svg>
+          Download Sample {{ uploadType === 'product' ? 'Product' : 'Inventory' }} File
+        </button>
+      </div>
+      <!-- END NEW -->
+
+      @if (!uploadReport) {
+      <div class="file-input-wrapper animate-in">
+        <input #uploadFileInput [id]="uploadType + '-file-input-modal'" class="custom-file-input" type="file"
+          (change)="onUploadFileSelected($event)" accept=".tsv"
+          [disabled]="isUploadingProduct || isUploadingInventory" />
+        <label [for]="uploadType + '-file-input-modal'" class="file-input-label">{{ uploadFile?.name || 'Choose a
+          file...' }}</label>
+      </div>
+      }
+
+      @if (uploadReport) {
+      <div class="report-download-modal animate-in">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#38a169"
+          stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem;">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+          <polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
+        <p>Upload processed. Download the report for details.</p>
+        <button class="button-primary download-report-btn" (click)="downloadReport()">Download Report</button>
+      </div>
+      }
+    </div>
+    <div class="modal-footer">
+      @if (!uploadReport) {
+      <button class="button-secondary" (click)="closeUploadModal()"
+        [disabled]="isUploadingProduct || isUploadingInventory">Cancel</button>
+      <button class="button-success" (click)="uploadFileFromModal()"
+        [disabled]="!uploadFile || isUploadingProduct || isUploadingInventory">
+        @if (isUploadingProduct || isUploadingInventory) {
+        <div class="button-spinner small white"></div>
+        <span>Uploading...</span>
+        } @else {
+        <span>Upload File</span>
+        }
+      </button>
+      } @else {
+      <button class="button-secondary" (click)="clearReportAndResetModal()">Upload Another File</button>
+      <button class="button-primary" (click)="closeUploadModal()">Close</button>
+      }
+    </div>
+  </div>
+</div>
+}
