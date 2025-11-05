@@ -16,17 +16,17 @@ import { ToastService } from '../../services/toast';
 })
 export class ReportPageComponent {
   // State for Sales Report
-  startDate: string | null = null; // Bound to date input (YYYY-MM-DD)
-  endDate: string | null = null;   // Bound to date input (YYYY-MM-DD)
-  isDownloadingSales = false;
+  public startDate: string | null = null; // Bound to date input (YYYY-MM-DD)
+  public endDate: string | null = null;   // Bound to date input (YYYY-MM-DD)
+  public isDownloadingSales = false;
 
   // State for Inventory Report
-  isDownloadingInventory = false;
+  public isDownloadingInventory = false;
 
   constructor(
     private reportService: ReportService,
     private toastService: ToastService
-  ) {}
+  ) { }
 
   downloadSalesReport(): void {
     if (!this.startDate || !this.endDate) {
@@ -38,8 +38,8 @@ export class ReportPageComponent {
     const start = new Date(this.startDate);
     const end = new Date(this.endDate);
     if (start > end) {
-        this.toastService.showError('Start date cannot be after end date.');
-        return;
+      this.toastService.showError('Start date cannot be after end date.');
+      return;
     }
 
     // Convert dates to ZonedDateTime ISO strings (start of day / end of day UTC)
@@ -76,19 +76,19 @@ export class ReportPageComponent {
 
   // --- Helper for TSV Download ---
   private triggerTsvDownload(blob: Blob, filename: string): void {
-     if (blob.size === 0) {
-        this.toastService.showError('Report file not found or is empty.');
-        return;
-     }
-     const url = window.URL.createObjectURL(blob);
-     const a = document.createElement('a');
-     a.href = url;
-     a.download = filename;
-     document.body.appendChild(a);
-     a.click();
-     // Cleanup
-     window.URL.revokeObjectURL(url);
-     a.remove();
+    if (blob.size === 0) {
+      this.toastService.showError('Report file not found or is empty.');
+      return;
+    }
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    // Cleanup
+    window.URL.revokeObjectURL(url);
+    a.remove();
   }
 
   // --- Error Handling ---
@@ -98,15 +98,15 @@ export class ReportPageComponent {
       // If the server sent a JSON error inside the blob
       const reader = new FileReader();
       reader.onload = (e: any) => {
-          try {
-              const errorJson = JSON.parse(e.target.result);
-              this.handleApiError({ error: errorJson }, reportType); // Pass the parsed JSON
-          } catch (parseError) {
-              this.toastService.showError(`Failed to download ${reportType} report and could not parse error details.`);
-          }
+        try {
+          const errorJson = JSON.parse(e.target.result);
+          this.handleApiError({ error: errorJson }, reportType); // Pass the parsed JSON
+        } catch (parseError) {
+          this.toastService.showError(`Failed to download ${reportType} report and could not parse error details.`);
+        }
       };
       reader.onerror = () => {
-          this.toastService.showError(`Failed to read error response from ${reportType} report download.`);
+        this.toastService.showError(`Failed to read error response from ${reportType} report download.`);
       };
       reader.readAsText(err.error);
     } else {
@@ -118,11 +118,11 @@ export class ReportPageComponent {
   /** Centralized handler for standard API errors */
   private handleApiError(err: any, reportType: 'sales' | 'inventory'): void {
     let action = `downloading ${reportType} report`;
-     if (err.error?.message && typeof err.error.message === 'string') {
-       this.toastService.showError(err.error.message);
-     } else {
-       this.toastService.showError(`Error ${action}. Please try again.`);
-       console.error(`Error ${action}:`, err);
-     }
+    if (err.error?.message && typeof err.error.message === 'string') {
+      this.toastService.showError(err.error.message);
+    } else {
+      this.toastService.showError(`Error ${action}. Please try again.`);
+      console.error(`Error ${action}:`, err);
+    }
   }
 }

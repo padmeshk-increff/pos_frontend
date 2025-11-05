@@ -44,29 +44,29 @@ import { ToastService } from '../../services/toast';
   ]
 })
 export class OrderPageComponent implements OnInit {
-  isLoading = true;
-  orders: Order[] = [];
-  paginationData: PaginationData<Order> | null = null;
+  public isLoading = true;
+  public orders: Order[] = [];
+  public paginationData: PaginationData<Order> | null = null;
 
-  currentPage = 0;
-  pageSize = 10;
+  public currentPage = 0;
+  public pageSize = 10;
 
-  filters: OrderFilters = { startDate: null, endDate: null, status: null, orderId: null };
-  searchOrderId: string = '';
+  public filters: OrderFilters = { startDate: null, endDate: null, status: null, orderId: null };
+  public searchOrderId: string = '';
 
-  expandedOrderId: number | null = null;
-  actionLoadingId: number | null = null;
+  public expandedOrderId: number | null = null;
+  public actionLoadingId: number | null = null;
 
   public OrderStatusEnum = OrderStatus;
-  orderStatusOptions = Object.values(OrderStatus);
+  public orderStatusOptions = Object.values(OrderStatus);
 
   // Confirmation Modal State
-  isConfirmModalVisible = false;
-  isModalClosing = false;
-  orderToConfirm: Order | null = null;
-  confirmModalText = '';
-  confirmModalAction: 'invoice' | 'cancel' | null = null;
-  currentAction: 'invoice' | 'cancel' | null = null;
+  public isConfirmModalVisible = false;
+  public isModalClosing = false;
+  public orderToConfirm: Order | null = null;
+  public confirmModalText = '';
+  public confirmModalAction: 'invoice' | 'cancel' | null = null;
+  public currentAction: 'invoice' | 'cancel' | null = null;
 
   constructor(
     private orderService: OrderService,

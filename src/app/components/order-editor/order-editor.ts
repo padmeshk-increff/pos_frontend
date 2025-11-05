@@ -21,18 +21,18 @@ import { ToastService } from '../../services/toast';
   styleUrls: ['./order-editor.css']
 })
 export class OrderEditorComponent implements OnInit {
-  barcodeInput: string = '';
+  public barcodeInput: string = '';
   // Keep quantityInput as string for text input
-  quantityInput: string = '1';
-  sellingPriceInput: string = '';
-  customerName: string = '';
-  customerPhone: string = '';
-  items: OrderItem[] = [];
-  totalAmount: number = 0;
-  isSubmitting = false;
+  public quantityInput: string = '1';
+  public sellingPriceInput: string = '';
+  public customerName: string = '';
+  public customerPhone: string = '';
+  public items: OrderItem[] = [];
+  public totalAmount: number = 0;
+  public isSubmitting = false;
 
-  isEditMode = false;
-  orderIdToEdit: number | null = null;
+  public isEditMode = false;
+  public orderIdToEdit: number | null = null;
   private originalItems: OrderItem[] = [];
   private originalCustomerName: string = '';
   private originalCustomerPhone: string = '';
@@ -55,11 +55,11 @@ export class OrderEditorComponent implements OnInit {
           this.orderIdToEdit = +id;
           // Fetch order details only if ID is present
           return this.orderService.getOrderById(this.orderIdToEdit).pipe(
-             catchError(err => {
-                 this.toastService.showError('Could not load order details.');
-                 this.router.navigate(['/orders']);
-                 return of(null); // Return null observable on error
-             })
+            catchError(err => {
+              this.toastService.showError('Could not load order details.');
+              this.router.navigate(['/orders']);
+              return of(null); // Return null observable on error
+            })
           );
         }
         // Not edit mode, no need to fetch
@@ -112,7 +112,7 @@ export class OrderEditorComponent implements OnInit {
     // Allow numbers, one decimal point, and essential keys
     const { key } = event;
     const currentValue = (event.target as HTMLInputElement).value;
-    
+
     if (
       !/[0-9]/.test(key) && // Not a number
       !(key === '.' && !currentValue.includes('.')) && // Not a decimal (and only one)
@@ -140,8 +140,8 @@ export class OrderEditorComponent implements OnInit {
     }
 
     if (!this.quantityInput || this.quantityInput.trim() === '') {
-        this.toastService.showError('Please enter a quantity.');
-        return;
+      this.toastService.showError('Please enter a quantity.');
+      return;
     }
     const quantity = parseInt(this.quantityInput.trim(), 10);
     if (isNaN(quantity) || quantity < 1) {
@@ -150,7 +150,7 @@ export class OrderEditorComponent implements OnInit {
     }
 
     // --- Parse selling price (if entered) ---
-    let newSellingPrice: number | null = null; 
+    let newSellingPrice: number | null = null;
     if (this.sellingPriceInput && this.sellingPriceInput.trim() !== '') {
       newSellingPrice = parseFloat(this.sellingPriceInput.trim());
       if (isNaN(newSellingPrice) || newSellingPrice <= 0) {
@@ -161,15 +161,15 @@ export class OrderEditorComponent implements OnInit {
 
     this.productService.getProductByBarcode(this.barcodeInput.trim()).subscribe({
       next: (product) => {
-        
+
         // --- LOGIC CHANGE: Find existing item by Product ID ONLY ---
         const existingItem = this.items.find(item => item.productId === product.id);
 
         if (existingItem) {
           // --- 1. Item Exists: Update it ---
-          
+
           // Add the new quantity
-          existingItem.quantity += quantity; 
+          existingItem.quantity += quantity;
 
           // Update price ONLY if a new one was entered
           if (newSellingPrice !== null) {
@@ -179,7 +179,7 @@ export class OrderEditorComponent implements OnInit {
 
         } else {
           // --- 2. Item is New: Add it ---
-          
+
           // Use the entered price if available, otherwise default to product's MRP
           const finalSellingPrice = newSellingPrice !== null ? newSellingPrice : product.mrp;
 
@@ -191,11 +191,11 @@ export class OrderEditorComponent implements OnInit {
           };
           this.items.push(newItem);
         }
-        
+
         // --- Reset inputs and update total ---
         this.calculateTotal();
-        this.barcodeInput = ''; 
-        this.quantityInput = '1'; 
+        this.barcodeInput = '';
+        this.quantityInput = '1';
         this.sellingPriceInput = ''; // Clear price input
       },
       error: (err) => this.handleApiError(err, 'finding product')
@@ -290,7 +290,7 @@ export class OrderEditorComponent implements OnInit {
         };
         updateObservables.push(
           this.orderItemService.addItem(this.orderIdToEdit!, form).pipe(
-             catchError(err => {
+            catchError(err => {
               console.error(`Failed to add item ${currentItem.productName}:`, err);
               return of({ error: `Failed to add item ${currentItem.productName}` });
             })
@@ -306,7 +306,7 @@ export class OrderEditorComponent implements OnInit {
           };
           updateObservables.push(
             this.orderItemService.updateItem(this.orderIdToEdit!, currentItem.id, form).pipe(
-               catchError(err => {
+              catchError(err => {
                 console.error(`Failed to update item ${currentItem.id}:`, err);
                 return of({ error: `Failed to update item ${currentItem.productName}` });
               })
@@ -323,15 +323,15 @@ export class OrderEditorComponent implements OnInit {
         next: (results) => {
           const errors = results.filter((res: any) => res && res.error);
           if (errors.length > 0) {
-             errors.forEach((err: any) => this.toastService.showError(err.error));
-             this.toastService.showError(`Order #${this.orderIdToEdit} updated with some issues. Please review.`);
-             this.orderService.getOrderById(this.orderIdToEdit!).subscribe(order => this.prefillFormForEditing(order));
+            errors.forEach((err: any) => this.toastService.showError(err.error));
+            this.toastService.showError(`Order #${this.orderIdToEdit} updated with some issues. Please review.`);
+            this.orderService.getOrderById(this.orderIdToEdit!).subscribe(order => this.prefillFormForEditing(order));
           } else if (updateObservables.length > 0 || customerInfoChanged) {
-             this.toastService.showSuccess(`Order #${this.orderIdToEdit} updated successfully!`);
-             this.router.navigate(['/orders']);
+            this.toastService.showSuccess(`Order #${this.orderIdToEdit} updated successfully!`);
+            this.router.navigate(['/orders']);
           } else {
-             this.toastService.showSuccess('No changes detected in the order.');
-             this.router.navigate(['/orders']);
+            this.toastService.showSuccess('No changes detected in the order.');
+            this.router.navigate(['/orders']);
           }
         },
         error: (err) => {
@@ -344,24 +344,24 @@ export class OrderEditorComponent implements OnInit {
   // --- Item List Actions ---
   increaseQuantity(index: number): void {
     if (this.items[index]) {
-        this.items[index].quantity++;
-        this.calculateTotal();
+      this.items[index].quantity++;
+      this.calculateTotal();
     }
   }
   decreaseQuantity(index: number): void {
     if (this.items[index]) {
-        this.items[index].quantity--;
-        if (this.items[index].quantity <= 0) {
-            this.removeItem(index);
-        } else {
-            this.calculateTotal();
-        }
+      this.items[index].quantity--;
+      if (this.items[index].quantity <= 0) {
+        this.removeItem(index);
+      } else {
+        this.calculateTotal();
+      }
     }
   }
   removeItem(index: number): void {
     if (index >= 0 && index < this.items.length) {
-        this.items.splice(index, 1);
-        this.calculateTotal();
+      this.items.splice(index, 1);
+      this.calculateTotal();
     }
   }
 
@@ -383,20 +383,20 @@ export class OrderEditorComponent implements OnInit {
     this.calculateTotal();
   }
 
-   // --- Error Handling ---
+  // --- Error Handling ---
   private handleApiError(err: any, context: string): void {
-     console.error(`Error ${context}:`, err);
-     if (err instanceof HttpErrorResponse) {
-         if (err.error?.message && typeof err.error.message === 'string') {
-             this.toastService.showError(err.error.message);
-         } else if (typeof err.error === 'string') {
-             this.toastService.showError(err.error);
-         } else {
-             this.toastService.showError(`An error occurred while ${context}. Status: ${err.status}`);
-         }
-     } else {
-         this.toastService.showError(`An unexpected error occurred while ${context}.`);
-     }
+    console.error(`Error ${context}:`, err);
+    if (err instanceof HttpErrorResponse) {
+      if (err.error?.message && typeof err.error.message === 'string') {
+        this.toastService.showError(err.error.message);
+      } else if (typeof err.error === 'string') {
+        this.toastService.showError(err.error);
+      } else {
+        this.toastService.showError(`An error occurred while ${context}. Status: ${err.status}`);
+      }
+    } else {
+      this.toastService.showError(`An unexpected error occurred while ${context}.`);
+    }
   }
 }
 

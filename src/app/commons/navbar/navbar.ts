@@ -17,7 +17,7 @@ import { Role } from '../../models/role.enum';
     trigger('dropdownAnimation', [
       state('void', style({ opacity: 0, transform: 'translateY(-10px)' })),
       state('*', style({ opacity: 1, transform: 'translateY(0)' })),
-      transition('void <=> *', [ animate('150ms ease-out') ])
+      transition('void <=> *', [animate('150ms ease-out')])
     ]),
     trigger('mobileMenuAnimation', [
       state('void', style({
@@ -37,16 +37,16 @@ import { Role } from '../../models/role.enum';
   ]
 })
 export class NavbarComponent implements OnInit, OnDestroy {
-  currentUser: AuthUser | null = null;
+  public currentUser: AuthUser | null = null;
   private userSubscription: Subscription = new Subscription();
-  isProfileDropdownOpen = false;
-  isMobileMenuOpen = false;
+  public isProfileDropdownOpen = false;
+  public isMobileMenuOpen = false;
 
   constructor(
-      private authService: AuthService,
-      private elementRef: ElementRef, // Keep ElementRef, it's used by Angular
-      private router: Router
-    ) {}
+    private authService: AuthService,
+    private elementRef: ElementRef, // Keep ElementRef, it's used by Angular
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
     this.userSubscription = this.authService.currentUser$.subscribe(user => {
@@ -118,7 +118,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     // (click)="$event.stopPropagation()" in the HTML.
     // Therefore, *any* click that reaches this document listener
     // is an "outside" click and should close both menus.
-    
+
     // Check if the mobile menu is open (since it's rendered outside
     // this component's elementRef, we still need a check for it)
     const mobileMenu = document.querySelector('.mobile-nav-links');
@@ -127,7 +127,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
       // This check is a failsafe
       return;
     }
-    
+
     // If click was not on mobile menu, and it reached here, close all.
     this.closeProfileDropdown();
     this.closeMobileMenu();

@@ -55,12 +55,12 @@ interface ReportFile {
 })
 export class ProductPageComponent implements OnInit, OnDestroy {
   // --- STATE ---
-  products: Product[] = [];
-  isLoading = true;
-  isSaving = false;
+  public products: Product[] = [];
+  public isLoading = true;
+  public isSaving = false;
 
   // Filter State
-  filters: ProductFilters = {
+  public filters: ProductFilters = {
     searchTerm: null,
     clientName: null,
     category: null,
@@ -69,25 +69,25 @@ export class ProductPageComponent implements OnInit, OnDestroy {
   };
 
   // Pagination State
-  paginationData: PaginationData<Product> | null = null;
-  currentPage = 0;
-  pageSize = 10; // Default page size
+  public paginationData: PaginationData<Product> | null = null;
+  public currentPage = 0;
+  public pageSize = 10; // Default page size
 
   // Add/Edit Modal State
-  isEditModalVisible = false;
-  productToEdit: Product | null = null;
-  originalProductState: Product | null = null;
-  isAddModalVisible = false;
-  newProduct: ProductForm | null = null;
-  isModalClosing = false;
+  public isEditModalVisible = false;
+  public productToEdit: Product | null = null;
+  public originalProductState: Product | null = null;
+  public isAddModalVisible = false;
+  public newProduct: ProductForm | null = null;
+  public isModalClosing = false;
 
   // Upload Modal State
-  isUploadModalVisible = false;
-  uploadType: 'product' | 'inventory' | null = null;
-  uploadFile: File | null = null;
-  isUploadingProduct = false;
-  isUploadingInventory = false;
-  uploadReport: ReportFile | null = null;
+  public isUploadModalVisible = false;
+  public uploadType: 'product' | 'inventory' | null = null;
+  public uploadFile: File | null = null;
+  public isUploadingProduct = false;
+  public isUploadingInventory = false;
+  public uploadReport: ReportFile | null = null;
 
   // --- NEW: Header constants ---
   // Made public so the template can access them
@@ -124,8 +124,8 @@ export class ProductPageComponent implements OnInit, OnDestroy {
 
     // Clear products array, but keep pagination data to avoid flicker
     if (this.currentPage === 0) {
-        this.products = [];
-        // this.paginationData = null; // <-- Keeping this non-null fixes the flicker
+      this.products = [];
+      // this.paginationData = null; // <-- Keeping this non-null fixes the flicker
     }
 
     const apiFilters: ProductFilters = {
@@ -154,8 +154,8 @@ export class ProductPageComponent implements OnInit, OnDestroy {
           this.isLoading = false;
         },
         error: (err) => {
-            this.isLoading = false;
-            this.handleApiError(err);
+          this.isLoading = false;
+          this.handleApiError(err);
         }
       });
   }
@@ -200,7 +200,7 @@ export class ProductPageComponent implements OnInit, OnDestroy {
 
     // Truncate to 2 decimal places
     if (parts[1] && parts[1].length > 2) {
-        numericValue = parts[0] + '.' + parts[1].substring(0, 2);
+      numericValue = parts[0] + '.' + parts[1].substring(0, 2);
     }
 
     const finalValue = (numericValue && numericValue !== '.') ? Number(numericValue) : null;
@@ -209,7 +209,7 @@ export class ProductPageComponent implements OnInit, OnDestroy {
     if (this.filters[field] !== finalValue) {
       // Use setTimeout to update the value in the next tick
       setTimeout(() => {
-          this.filters[field] = finalValue;
+        this.filters[field] = finalValue;
       });
     }
   }
@@ -274,7 +274,7 @@ export class ProductPageComponent implements OnInit, OnDestroy {
   }
 
   // --- DATA MANIPULATION LOGIC ---
-    addProduct(): void {
+  addProduct(): void {
     if (!this.newProduct || this.isSaving) return;
     if (!this.newProduct.name.trim() || !this.newProduct.barcode.trim() || !this.newProduct.category.trim()) {
       this.toastService.showError('Name, Barcode, and Category are required.');

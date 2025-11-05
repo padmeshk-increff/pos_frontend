@@ -20,15 +20,15 @@ import { trigger, transition, style, animate } from '@angular/animations';
       transition(':enter', [
         style({ opacity: 0, transform: 'translateY(10px)' }),
         // Slower fade-in to feel smooth
-        animate('0.6s ease-out', 
+        animate('0.6s ease-out',
           style({ opacity: 1, transform: 'translateY(0)' })
         )
       ]),
-      
+
       // :leave (fade out)
       transition(':leave', [
         // Faster fade-out
-        animate('0.3s ease-in', 
+        animate('0.3s ease-in',
           style({ opacity: 0 })
         )
       ])
@@ -36,14 +36,14 @@ import { trigger, transition, style, animate } from '@angular/animations';
   ]
 })
 export class HomePageComponent implements OnInit {
-  isLoading = true;
-  summaryData: DashboardSummary | null = null;
+  public isLoading = true;
+  public summaryData: DashboardSummary | null = null;
 
   // Convenience getters for template binding
-  get todaySales(): KpiData | null { return this.summaryData?.todaySales ?? null; }
-  get todayOrders(): KpiData | null { return this.summaryData?.todayOrders ?? null; }
-  get averageOrderValue(): KpiData | null { return this.summaryData?.averageOrderValue ?? null; }
-  get lowStockItems(): LowStockAlert[] { return this.summaryData?.lowStockAlerts ?? []; }
+  public get todaySales(): KpiData | null { return this.summaryData?.todaySales ?? null; }
+  public get todayOrders(): KpiData | null { return this.summaryData?.todayOrders ?? null; }
+  public get averageOrderValue(): KpiData | null { return this.summaryData?.averageOrderValue ?? null; }
+  public get lowStockItems(): LowStockAlert[] { return this.summaryData?.lowStockAlerts ?? []; }
 
   constructor(
     private router: Router,

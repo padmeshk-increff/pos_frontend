@@ -50,10 +50,10 @@ export class ClientPageComponent implements OnInit {
   public activeSearchTerm: string = ''; // The filter currently applied
 
   // Add these new properties to the component class (near other state)
-public showSkeleton = false;
-public showLoaderOverlay = false;
-private loaderOverlayTimer: any = null;
-private pendingFetchedData: PaginationData<Client> | null = null;
+  public showSkeleton = false;
+  public showLoaderOverlay = false;
+  private loaderOverlayTimer: any = null;
+  private pendingFetchedData: PaginationData<Client> | null = null;
 
 
   // --- Pagination State ---
@@ -80,90 +80,90 @@ private pendingFetchedData: PaginationData<Client> | null = null;
   }
 
   public fetchClients(): void {
-  // Start sequence: show skeleton immediately; loader after a short delay
-  this.isLoading = true;
-  this.showSkeleton = true;
-  this.showLoaderOverlay = false;
+    // Start sequence: show skeleton immediately; loader after a short delay
+    this.isLoading = true;
+    this.showSkeleton = true;
+    this.showLoaderOverlay = false;
 
-  // clear any previous timer
-  if (this.loaderOverlayTimer) {
-    clearTimeout(this.loaderOverlayTimer);
-    this.loaderOverlayTimer = null;
-  }
+    // clear any previous timer
+    if (this.loaderOverlayTimer) {
+      clearTimeout(this.loaderOverlayTimer);
+      this.loaderOverlayTimer = null;
+    }
 
-  // Only show the loader overlay if request takes longer than this (ms)
-  const LOADER_DELAY_MS = 180;
-  this.loaderOverlayTimer = setTimeout(() => {
-    this.showLoaderOverlay = true;
-    this.loaderOverlayTimer = null;
-  }, LOADER_DELAY_MS);
+    // Only show the loader overlay if request takes longer than this (ms)
+    const LOADER_DELAY_MS = 180;
+    this.loaderOverlayTimer = setTimeout(() => {
+      this.showLoaderOverlay = true;
+      this.loaderOverlayTimer = null;
+    }, LOADER_DELAY_MS);
 
-  // Optionally clear table data on first page to avoid confusing tics
-  if (this.currentPage === 0) {
-    this.clients = [];
-    this.paginationData = null;
-  }
+    // Optionally clear table data on first page to avoid confusing tics
+    if (this.currentPage === 0) {
+      this.clients = [];
+      this.paginationData = null;
+    }
 
-  const filterName = this.activeSearchTerm.trim() || null;
+    const filterName = this.activeSearchTerm.trim() || null;
 
-  // Keep incoming data in temp var so we can reveal it after skeleton fades
-  this.pendingFetchedData = null;
+    // Keep incoming data in temp var so we can reveal it after skeleton fades
+    this.pendingFetchedData = null;
 
-  this.clientService.getFilteredClients(filterName, this.currentPage, this.pageSize)
-    .subscribe({
-      next: (data) => {
-        // store incoming data; hide loader overlay immediately
-        if (this.loaderOverlayTimer) {
-          clearTimeout(this.loaderOverlayTimer);
-          this.loaderOverlayTimer = null;
-        }
-        this.showLoaderOverlay = false;
-
-        // mark loading finished (drives :leave animation)
-        this.isLoading = false;
-
-        // cache data until we remove skeleton (so content doesn't pop in under skeleton)
-        this.pendingFetchedData = data;
-
-        // after a short fade-out delay, apply the new content and hide skeleton
-        const SKELETON_FADE_MS = 160;
-        setTimeout(() => {
-          if (this.pendingFetchedData) {
-            this.clients = this.pendingFetchedData.content;
-            this.paginationData = this.pendingFetchedData;
-            // bounds-check for currentPage vs totalPages
-            if (this.paginationData && this.paginationData.totalPages > 0 && this.currentPage >= this.paginationData.totalPages) {
-              this.currentPage = Math.max(0, this.paginationData.totalPages - 1);
-            }
-            this.pendingFetchedData = null;
+    this.clientService.getFilteredClients(filterName, this.currentPage, this.pageSize)
+      .subscribe({
+        next: (data) => {
+          // store incoming data; hide loader overlay immediately
+          if (this.loaderOverlayTimer) {
+            clearTimeout(this.loaderOverlayTimer);
+            this.loaderOverlayTimer = null;
           }
-          // hide skeleton to reveal content
-          this.showSkeleton = false;
-        }, SKELETON_FADE_MS);
-      },
-      error: (err) => {
-        // cleanup timers & overlays
-        if (this.loaderOverlayTimer) {
-          clearTimeout(this.loaderOverlayTimer);
-          this.loaderOverlayTimer = null;
+          this.showLoaderOverlay = false;
+
+          // mark loading finished (drives :leave animation)
+          this.isLoading = false;
+
+          // cache data until we remove skeleton (so content doesn't pop in under skeleton)
+          this.pendingFetchedData = data;
+
+          // after a short fade-out delay, apply the new content and hide skeleton
+          const SKELETON_FADE_MS = 160;
+          setTimeout(() => {
+            if (this.pendingFetchedData) {
+              this.clients = this.pendingFetchedData.content;
+              this.paginationData = this.pendingFetchedData;
+              // bounds-check for currentPage vs totalPages
+              if (this.paginationData && this.paginationData.totalPages > 0 && this.currentPage >= this.paginationData.totalPages) {
+                this.currentPage = Math.max(0, this.paginationData.totalPages - 1);
+              }
+              this.pendingFetchedData = null;
+            }
+            // hide skeleton to reveal content
+            this.showSkeleton = false;
+          }, SKELETON_FADE_MS);
+        },
+        error: (err) => {
+          // cleanup timers & overlays
+          if (this.loaderOverlayTimer) {
+            clearTimeout(this.loaderOverlayTimer);
+            this.loaderOverlayTimer = null;
+          }
+          this.showLoaderOverlay = false;
+          this.isLoading = false;
+
+          // hide skeleton after short delay so UI doesn't instantly jump
+          setTimeout(() => {
+            this.showSkeleton = false;
+          }, 120);
+
+          // clear data so empty state shows
+          this.clients = [];
+          this.paginationData = null;
+
+          this.toastService.showError('Could not load clients.');
+          console.error("Error loading clients:", err);
         }
-        this.showLoaderOverlay = false;
-        this.isLoading = false;
-
-        // hide skeleton after short delay so UI doesn't instantly jump
-        setTimeout(() => {
-          this.showSkeleton = false;
-        }, 120);
-
-        // clear data so empty state shows
-        this.clients = [];
-        this.paginationData = null;
-
-        this.toastService.showError('Could not load clients.');
-        console.error("Error loading clients:", err);
-      }
-    });
-}
+      });
+  }
 
 
   // --- Search/Filter Logic ---
@@ -279,14 +279,14 @@ private pendingFetchedData: PaginationData<Client> | null = null;
     this.clientService.createClient(clientToAdd)
       .pipe(finalize(() => {
         this.isSaving = false
-        if(addedSuccessfully) this.closeAddModal();
+        if (addedSuccessfully) this.closeAddModal();
       }))
       .subscribe({
         next: (addedClient) => {
-          addedSuccessfully=true;
+          addedSuccessfully = true;
           this.toastService.showSuccess('Client added successfully!');
 
-          this.resetFilters(); 
+          this.resetFilters();
 
         },
         error: (err) => {
