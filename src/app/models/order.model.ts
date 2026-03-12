@@ -44,7 +44,7 @@ export interface OrderForm {
 export interface OrderUpdateForm {
   customerName: string;
   customerPhone: string;
-  status: OrderStatus;
+  orderStatus: OrderStatus;
 }
 
 // For adding a new item to an existing order.

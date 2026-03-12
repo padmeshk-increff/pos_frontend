@@ -1,20 +1,33 @@
-import { Component } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 import { ReportService } from '../../services/report'; // Assuming you create this service
 import { ToastService } from '../../services/toast';
+import { handleHttpError } from '../../utils/error-handler';
 
 @Component({
   selector: 'app-report-page',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './report.html',
-  styleUrl: './report.css'
+  styleUrl: './report.css',
+  animations: [
+    trigger('shellFadeIn', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(15px)' }),
+        // Fade in shell with no delay
+        animate('0.5s ease-out',
+          style({ opacity: 1, transform: 'translateY(0)' })
+        )
+      ])
+    ])
+  ]
 })
-export class ReportPageComponent {
+export class ReportPageComponent implements AfterViewInit {
   // State for Sales Report
   public startDate: string | null = null; // Bound to date input (YYYY-MM-DD)
   public endDate: string | null = null;   // Bound to date input (YYYY-MM-DD)
@@ -27,6 +40,178 @@ export class ReportPageComponent {
     private reportService: ReportService,
     private toastService: ToastService
   ) { }
+
+  ngAfterViewInit(): void {
+    // Set up border glow effect for reports card
+    this.setupGlowEffect();
+  }
+
+  private setupGlowEffect(): void {
+    const setupElements = () => {
+      // Get the reports card
+      const reportsCard = document.querySelector('.reports-card') as HTMLElement;
+
+      if (!reportsCard) {
+        setTimeout(setupElements, 100);
+        return;
+      }
+
+      if ((reportsCard as any).__glowSetup) return;
+      (reportsCard as any).__glowSetup = true;
+
+      let lastMoveTime = 0;
+      let fadeAnimationFrame: number | null = null;
+      let positionAnimationFrame: number | null = null;
+      let cachedRect: DOMRect | null = null;
+      let rectCacheTime = 0;
+      
+      let targetX = 0;
+      let targetY = 0;
+      let currentX = 0;
+      let currentY = 0;
+      
+      let lastX = 0;
+      let lastY = 0;
+      let lastTime = 0;
+      const velocityHistory: number[] = [];
+      const MAX_VELOCITY_HISTORY = 5;
+      let currentVelocity = 0;
+      
+      let targetSize = 200;
+      let currentSize = 200;
+      
+      const fadeOutDelay = 200;
+      const fadeOutDuration = 300;
+      const RECT_CACHE_DURATION = 100;
+      const SMOOTH_FOLLOW_SPEED = 0.15;
+      const MIN_GLOW_SIZE = 150;
+      const MAX_GLOW_SIZE = 500;
+      const MAX_VELOCITY = 2000;
+
+      const getCachedRect = (): DOMRect => {
+        const now = performance.now();
+        if (!cachedRect || (now - rectCacheTime) > RECT_CACHE_DURATION) {
+          cachedRect = reportsCard.getBoundingClientRect();
+          rectCacheTime = now;
+        }
+        return cachedRect;
+      };
+
+      const lerp = (start: number, end: number, factor: number): number => {
+        return start + (end - start) * factor;
+      };
+
+      const calculateVelocity = (x: number, y: number, time: number): number => {
+        if (lastTime === 0) {
+          lastX = x;
+          lastY = y;
+          lastTime = time;
+          return 0;
+        }
+        
+        const deltaTime = (time - lastTime) / 1000;
+        if (deltaTime <= 0) return currentVelocity;
+        
+        const deltaX = x - lastX;
+        const deltaY = y - lastY;
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const instantVelocity = distance / deltaTime;
+        
+        velocityHistory.push(instantVelocity);
+        if (velocityHistory.length > MAX_VELOCITY_HISTORY) {
+          velocityHistory.shift();
+        }
+        
+        const avgVelocity = velocityHistory.reduce((a, b) => a + b, 0) / velocityHistory.length;
+        
+        lastX = x;
+        lastY = y;
+        lastTime = time;
+        
+        return avgVelocity;
+      };
+
+      const updateGlowSize = (velocity: number): void => {
+        const normalizedVelocity = Math.min(velocity / MAX_VELOCITY, 1);
+        const easedVelocity = Math.pow(normalizedVelocity, 0.6);
+        targetSize = MIN_GLOW_SIZE + (MAX_GLOW_SIZE - MIN_GLOW_SIZE) * easedVelocity;
+      };
+
+      const animateGlow = () => {
+        const now = performance.now();
+        const timeSinceMove = now - lastMoveTime;
+        
+        currentX = lerp(currentX, targetX, SMOOTH_FOLLOW_SPEED);
+        currentY = lerp(currentY, targetY, SMOOTH_FOLLOW_SPEED);
+        currentSize = lerp(currentSize, targetSize, 0.1);
+        
+        // Clamp lerped values to card bounds to prevent overflow
+        const rect = getCachedRect();
+        const clampedX = Math.max(0, Math.min(currentX, rect.width));
+        const clampedY = Math.max(0, Math.min(currentY, rect.height));
+        
+        reportsCard.style.setProperty('--card-cursor-x', `${clampedX}px`);
+        reportsCard.style.setProperty('--card-cursor-y', `${clampedY}px`);
+        reportsCard.style.setProperty('--card-glow-size', `${currentSize}px`);
+        
+        if (timeSinceMove < fadeOutDelay) {
+          reportsCard.style.setProperty('--card-glow-opacity', '1');
+          positionAnimationFrame = requestAnimationFrame(animateGlow);
+        } else if (timeSinceMove < fadeOutDelay + fadeOutDuration) {
+          const fadeProgress = (timeSinceMove - fadeOutDelay) / fadeOutDuration;
+          const opacity = 1 - fadeProgress;
+          reportsCard.style.setProperty('--card-glow-opacity', opacity.toString());
+          positionAnimationFrame = requestAnimationFrame(animateGlow);
+        } else {
+          reportsCard.style.setProperty('--card-glow-opacity', '0');
+          positionAnimationFrame = null;
+        }
+      };
+
+      const handleMouseMove = (e: MouseEvent) => {
+        const now = performance.now();
+        const rect = getCachedRect();
+        // Clamp relative position to card bounds to prevent overflow
+        const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+        const y = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
+        
+        targetX = x;
+        targetY = y;
+        currentVelocity = calculateVelocity(x, y, now);
+        updateGlowSize(currentVelocity);
+        lastMoveTime = now;
+        
+        if (!positionAnimationFrame) {
+          positionAnimationFrame = requestAnimationFrame(animateGlow);
+        }
+      };
+
+      const handleMouseLeave = () => {
+        if (fadeAnimationFrame) {
+          cancelAnimationFrame(fadeAnimationFrame);
+          fadeAnimationFrame = null;
+        }
+        if (positionAnimationFrame) {
+          cancelAnimationFrame(positionAnimationFrame);
+          positionAnimationFrame = null;
+        }
+        
+        cachedRect = null;
+        lastMoveTime = 0;
+        lastTime = 0;
+        velocityHistory.length = 0;
+        currentVelocity = 0;
+        targetSize = MIN_GLOW_SIZE;
+        
+        reportsCard.style.setProperty('--card-glow-opacity', '0');
+      };
+
+      reportsCard.addEventListener('mousemove', handleMouseMove);
+      reportsCard.addEventListener('mouseleave', handleMouseLeave);
+    };
+
+    setTimeout(setupElements, 100);
+  }
 
   downloadSalesReport(): void {
     if (!this.startDate || !this.endDate) {
@@ -100,13 +285,13 @@ export class ReportPageComponent {
       reader.onload = (e: any) => {
         try {
           const errorJson = JSON.parse(e.target.result);
-          this.handleApiError({ error: errorJson }, reportType); // Pass the parsed JSON
+          handleHttpError({ error: errorJson }, this.toastService, `Failed to download ${reportType} report.`);
         } catch (parseError) {
-          this.toastService.showError(`Failed to download ${reportType} report and could not parse error details.`);
+          handleHttpError(err, this.toastService, `Failed to download ${reportType} report and could not parse error details.`);
         }
       };
       reader.onerror = () => {
-        this.toastService.showError(`Failed to read error response from ${reportType} report download.`);
+        handleHttpError(err, this.toastService, `Failed to read error response from ${reportType} report download.`);
       };
       reader.readAsText(err.error);
     } else {
@@ -117,12 +302,7 @@ export class ReportPageComponent {
 
   /** Centralized handler for standard API errors */
   private handleApiError(err: any, reportType: 'sales' | 'inventory'): void {
-    let action = `downloading ${reportType} report`;
-    if (err.error?.message && typeof err.error.message === 'string') {
-      this.toastService.showError(err.error.message);
-    } else {
-      this.toastService.showError(`Error ${action}. Please try again.`);
-      console.error(`Error ${action}:`, err);
-    }
+    const defaultMessage = `Error downloading ${reportType} report. Please try again.`;
+    handleHttpError(err, this.toastService, defaultMessage);
   }
 }

@@ -1,4 +1,7 @@
 <app-navbar></app-navbar>
 <main class="main-content">
-  <router-outlet></router-outlet>
+  <div [@routeAnimations]="prepareRoute(outlet)" class="route-container">
+    <router-outlet #outlet="outlet"></router-outlet>
+  </div>
 </main>
+<!-- Global cursor glow effect removed for performance -->

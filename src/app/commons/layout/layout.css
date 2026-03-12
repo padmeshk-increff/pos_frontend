@@ -1,0 +1,13 @@
+.route-container {
+  position: relative;
+  width: 100%;
+  overflow-x: hidden;
+  /* z-index removed - was creating stacking context that trapped modals below navbar */
+}
+
+.route-container > * {
+  display: block;
+}
+
+/* Global cursor glow effect removed for performance optimization */
+

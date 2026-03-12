@@ -9,7 +9,7 @@ export interface Product {
   imageUrl?: string; // The '?' makes this property optional
   clientId: number;
   clientName:string;
-  quantity: number;
+  quantity: number | null; // Can be null when inventory data is not available
 }
 
 // This interface represents the data you send to the backend when creating a new product.

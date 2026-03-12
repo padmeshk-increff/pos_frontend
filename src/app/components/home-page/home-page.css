@@ -4,7 +4,8 @@
 .dashboard-stage {
   position: relative;
   /* Give it a minimum height to prevent the whole page from "jumping" */
-  min-height: 70vh; 
+  min-height: 70vh;
+  padding-bottom: 2rem;
 }
 
 .loader-wrapper,
@@ -13,6 +14,8 @@
   top: 0;
   left: 0;
   width: 100%;
+  padding-bottom: 2rem;
+  box-sizing: border-box;
 }
 
 /* Style the loader-wrapper to center its contents,
@@ -30,6 +33,12 @@
 
 .dashboard-container{
   position:relative;
+  padding-bottom: 2rem;
+}
+
+.dashboard-stage {
+  position: relative;
+  z-index: 0;
 }
 
 .dashboard-container h1 {
@@ -49,10 +58,67 @@
   gap: 1.5rem; margin-bottom: 2.5rem;
 }
 
+@media (max-width: 640px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+    min-width: 0;
+  }
+}
+
 .kpi-card {
-  background: var(--card-bg); border-radius: 12px; padding: 25px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2); border: 1px solid var(--border-color);
-  display: flex; flex-direction: column; gap: 8px;
+  background: var(--card-bg-lighter); 
+  border-radius: 12px; 
+  padding: 25px;
+  border: 1px solid var(--border-color);
+  display: flex; 
+  flex-direction: column; 
+  gap: 8px;
+  position: relative;
+  overflow: hidden; /* Changed from visible to prevent overflow */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  min-width: 0;
+}
+
+/* Border glow effect that reacts to cursor position - only the border glows */
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  inset: 0; /* Changed from -2px to prevent overflow */
+  border-radius: 12px; /* Match card border-radius */
+  /* Constrain gradient size - position is already clamped in TypeScript */
+  background: radial-gradient(
+    circle clamp(100px, var(--card-glow-size, 200px), 300px) at var(--card-cursor-x, 50%) var(--card-cursor-y, 50%),
+    rgba(99, 179, 237, 1) 0%,
+    rgba(66, 153, 225, 0.95) 15%,
+    rgba(59, 130, 246, 0.85) 30%,
+    rgba(59, 130, 246, 0.6) 45%,
+    rgba(59, 130, 246, 0.3) 60%,
+    rgba(59, 130, 246, 0.1) 75%,
+    transparent 90%
+  );
+  z-index: -1;
+  opacity: var(--card-glow-opacity, 0);
+  transition: opacity 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+  pointer-events: none;
+  filter: blur(2px);
+  will-change: opacity;
+  transform: translateZ(0);
+  contain: layout style paint; /* Isolate rendering */
+}
+
+.kpi-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: var(--card-bg-lighter);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.kpi-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .kpi-header {
@@ -76,6 +142,10 @@
 .kpi-value {
   font-size: 2.5rem; font-weight: 700; color: var(--text-primary);
   line-height: 1.1; margin-bottom: 5px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .kpi-comparison {
@@ -90,12 +160,35 @@
 
 .kpi-change-label { color: var(--text-secondary); opacity: 0.8; }
 
+/* Responsive styles for KPI cards */
+@media (max-width: 768px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .kpi-value {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .kpi-value {
+    font-size: 1.75rem;
+  }
+  
+  .kpi-card {
+    padding: 20px;
+  }
+}
+
 /* --- Grid Layout for Actions & Alerts --- */
 .actions-alerts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 1.5rem;
   align-items: start; /* Keep items aligned to top */
+  margin-bottom: 0;
+  margin-top: 0;
 }
 
 /* Default span for all items */
@@ -117,16 +210,60 @@
   display: flex; flex-direction: column; align-items: center;
   justify-content: center; gap: 10px;
   position: relative;
+  overflow: hidden; /* Changed from visible to prevent overflow */
   /* --- FIX: Updated transition --- */
   transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
   appearance: button;
   /* --- FIX: Set up for background-clip border --- */
   border: 1px solid var(--border-color) !important; /* Base border color */
-  background: var(--card-bg) !important;
+  background: var(--card-bg-lighter) !important;
   background-clip: padding-box; /* This is key! Background only fills padding area */
   border-radius: 12px !important;
   box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
   min-height: 160px; /* Keep minimum height */
+  height: 100%; /* Ensure all cards have same height in grid */
+}
+
+/* Border glow effect that reacts to cursor position - only the border glows */
+.action-card::before {
+  content: '';
+  position: absolute;
+  inset: 0; /* Changed from -2px to prevent overflow */
+  border-radius: 12px; /* Match card border-radius */
+  /* Constrain gradient size - position is already clamped in TypeScript */
+  background: radial-gradient(
+    circle clamp(100px, var(--card-glow-size, 200px), 300px) at var(--card-cursor-x, 50%) var(--card-cursor-y, 50%),
+    rgba(99, 179, 237, 1) 0%,
+    rgba(66, 153, 225, 0.95) 15%,
+    rgba(59, 130, 246, 0.85) 30%,
+    rgba(59, 130, 246, 0.6) 45%,
+    rgba(59, 130, 246, 0.3) 60%,
+    rgba(59, 130, 246, 0.1) 75%,
+    transparent 90%
+  );
+  z-index: -1;
+  opacity: var(--card-glow-opacity, 0);
+  transition: opacity 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+  pointer-events: none;
+  filter: blur(2px);
+  will-change: opacity;
+  transform: translateZ(0);
+  contain: layout style paint; /* Isolate rendering */
+}
+
+.action-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: var(--card-bg-lighter);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.action-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* --- REMOVED ::before, ::after, and animation rules --- */
@@ -152,11 +289,14 @@
   border-radius: 50%; display: flex; align-items: center; justify-content: center;
   transition: all 0.3s ease;
   position: relative; /* Keep relative */
+  border: none; /* Ensure no border */
 }
 .action-icon-wrapper svg {
   width: 24px; height: 24px; /* Increased size */
   fill: currentColor; position: absolute; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
+  border: none; /* Ensure SVG has no border */
+  outline: none; /* Remove any outline */
 }
 
 .action-icon-wrapper.order { background-color: rgba(66, 153, 225, 0.2); color: var(--accent-color); }
@@ -166,22 +306,55 @@
 
 .action-card:hover .action-icon-wrapper { transform: scale(1.1); }
 
-.action-icon-wrapper.alert { background-color: rgba(229, 62, 62, 0.2); color: var(--danger-color); }
+.action-icon-wrapper.alert { 
+  background-color: rgba(229, 62, 62, 0.2); 
+  color: var(--danger-color);
+  border: none !important; /* Override Bootstrap alert styles */
+  box-shadow: none !important;
+}
+
+/* Override Bootstrap alert styles for SVG inside alert icon wrapper */
+.action-icon-wrapper.alert svg {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  stroke: none !important;
+}
 
 .action-card:hover .action-icon-wrapper { transform: scale(1.1); }
 
-.action-card-value {
-  font-size: 2rem;
+/* Low stock badge - positioned on icon */
+.low-stock-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: var(--danger-color);
+  color: white;
+  border-radius: 12px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
   font-weight: 700;
+  border: 2px solid var(--card-bg);
+  box-shadow: 0 2px 6px rgba(229, 62, 62, 0.4);
+  z-index: 1;
   line-height: 1;
-  margin-top:auto;
+  white-space: nowrap;
 }
-.action-card-value.danger {
-  color: var(--danger-color);
-  vertical-align: middle;
+
+/* Ensure badge is visible and readable */
+.action-icon-wrapper.alert .low-stock-badge {
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 0;
 }
-.action-card-value.success {
-  color: var(--success-color);
+
+/* Ensure alert icon wrapper doesn't have extra margin that affects height */
+.action-icon-wrapper.alert {
+  margin-bottom: 0; /* Remove any bottom margin */
 }
 
 

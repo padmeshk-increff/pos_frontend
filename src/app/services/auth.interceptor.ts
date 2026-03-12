@@ -1,43 +1,42 @@
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
 import {
   HttpInterceptorFn,
   HttpRequest,
   HttpHandlerFn,
   HttpEvent,
-  HttpErrorResponse
+  HttpErrorResponse,
+
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { AuthService } from './auth.service';
+import { AuthService } from '../services/auth.service'; // Ensure this path is correct
 
-/**
- * This is the new, modern functional interceptor.
- */
 export const authInterceptor: HttpInterceptorFn = (
-  req: HttpRequest<any>, 
+  req: HttpRequest<any>,
   next: HttpHandlerFn
 ): Observable<HttpEvent<any>> => {
 
-  const authService = inject(AuthService); // We inject the service using the inject() function
-  const token = authService.getToken();
+  const authService = inject(AuthService);
+  const router = inject(Router);
+  // const tokenExtractor = inject(HttpXsrfTokenExtractor); // 2. REMOVED: No longer needed
 
-  if (token) {
-    // If a token exists, clone the request to add the new header.
-    req = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-  }
-
+  // 3. This is perfect! This adds withCredentials to EVERY request.
+  // This is better than adding it in each service.
+  req = req.clone({
+    withCredentials: true
+  });
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      // If the API returns a 401 Unauthorized, automatically log the user out.
-      if (error.status === 401) {
-        authService.logout();
+      // This 401 logout logic is still correct
+      if (error.status === 401 && !req.url.includes('/session/login')) {
+        // You might need a way to log the user out without
+        // causing a circular dependency if AuthService uses HttpClient
+        // But if authService.logoutInternal() just clears local state, this is fine.
+        authService.logoutInternal(); // Assuming this clears local user info
+        router.navigate(['/login']);
       }
       return throwError(() => error);
     })
   );
 };
-

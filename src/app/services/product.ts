@@ -11,6 +11,7 @@ export interface ProductFilters {
   category?: string | null;
   minMrp?: number | null;
   maxMrp?: number | null;
+  maxInventory?: number | null; // Filter products with inventory <= this value (for low stock)
 }
 
 @Injectable({
@@ -50,6 +51,9 @@ export class ProductService {
     }
     if (filters.maxMrp != null) { // Check for null/undefined explicitly for numbers
       params = params.append('maxMrp', filters.maxMrp.toString());
+    }
+    if (filters.maxInventory != null) { // Filter by maximum inventory (for low stock)
+      params = params.append('maxInventory', filters.maxInventory.toString());
     }
 
     // Expect PaginationData<Product> from the backend

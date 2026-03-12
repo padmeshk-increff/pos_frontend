@@ -1,6 +1,4 @@
-/*
- * Styles unique to the Order Editor page.
- */
+/* Border glow effect is now in styles.css */
 
 /* --- LAYOUT & TYPOGRAPHY --- */
 .page-container {
@@ -9,33 +7,111 @@
   padding: 20px;
 }
 
-.header-row {
-  position: relative;
-  display: flex;
-  align-items: center;
-  margin-bottom: 2.5rem;
-  min-height: 40px;
-}
+/* Header row - now using Bootstrap utilities: d-flex align-items-center mb-5 */
+/* CSS removed - replaced with Bootstrap classes in HTML templates */
+/* Note: position, min-height kept as inline styles for specific layout */
 
 .back-button {
+  background: transparent;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-secondary) !important;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all var(--transition-speed) ease;
+  /* Display and alignment - now using Bootstrap utilities: d-inline-flex align-items-center */
+  gap: 6px;
+  white-space: nowrap;
+  line-height: 1;
   position: absolute;
   left: 0;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 1;
 }
 
-.header-row h1 {
-  width: 100%;
-  text-align: center;
-  margin: 0;
+.back-button::before {
+  content: '←';
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-right: 2px;
 }
+
+.back-button:hover {
+  background: rgba(66, 153, 225, 0.1);
+  border-color: var(--accent-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.back-button:hover::before {
+  color: var(--accent-color);
+}
+
+.back-button:active {
+  background: rgba(66, 153, 225, 0.15);
+  border-color: var(--accent-hover) !important;
+  color: var(--accent-hover) !important;
+}
+
+.back-button:active::before {
+  color: var(--accent-hover);
+}
+
+/* focus-visible — subtle accessibility ring */
+.back-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.25);
+}
+
+/* disabled state */
+.back-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+
+/* Header row h1 - now using Bootstrap utilities: text-center w-100 mb-0 */
+/* CSS removed - replaced with Bootstrap classes in HTML templates */
 
 h3 {
-  font-size: 1.4rem;
-  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  margin-bottom: 0.875rem;
+  margin-top: 0;
   color: var(--text-primary);
-  font-weight:600;
+  font-weight: 600;
+}
+
+.editor-content > h3:first-child {
+  margin-top: 0;
+}
+
+/* Section headings with better spacing and visual separation */
+.section-heading {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.25rem;
+  margin-top: 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--border-color);
+  position: relative;
+}
+
+.section-heading::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: var(--accent-color);
+  border-radius: 2px;
+}
+
+.editor-content > .section-heading:first-child {
+  margin-top: 0;
 }
 
 .form-label {
@@ -53,37 +129,77 @@ h3 {
   opacity: 0.7;
 }
 
-.border-bottom-separator {
-   border-bottom: 1px solid var(--border-color);
+/* Increase input field heights in order-editor to match across all inputs */
+.add-item-form .form-control,
+.customer-info-section .form-control {
+  height: 44px !important;
+  min-height: 44px !important;
+  padding: 10px 14px !important;
+  font-size: 0.9rem !important;
 }
 
+
 .add-item-btn {
-  height: calc(1.5em + 0.97rem + 2px + 2px); /* Matches BS input height */
+  height: 44px !important;
+  min-height: 44px !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
-  margin-bottom:1px;
+  padding: 0 0.8rem;
+  padding-right: 1rem;
+  margin-bottom: 1px;
   flex-shrink: 0;
 }
+
 .add-item-btn svg {
-   margin-right: 0.35rem; 
+  margin-right: 0.35rem;
+  transition:all 0.3s ease;
+}
+
+.add-item-btn:hover svg{
+  scale: 1.1;
 }
 
 /* --- ORDER DETAILS & ITEM LIST --- */
 .items-list {
   overflow-y: auto;
-  max-height: 400px; /* Example max height */
+  max-height: 400px;
+  min-height: 120px;
+}
+
+.items-list:has(.empty-message) {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.empty-message-icon {
+  opacity: 0.6;
+  transition: all 0.3s ease-in-out;
+  animation: float 3s ease-in-out infinite;
+}
+
+.empty-message:hover .empty-message-icon {
+  opacity: 1;
+  transform: scale(1.1);
+  color: var(--accent-color);
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
 }
 
 .item-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
+  padding: 1.25rem 1rem;
   border-bottom: 1px solid var(--border-color);
   transition: background-color 0.2s ease;
+  border-radius: 8px;
 }
 
 .item-row:last-child {
@@ -94,102 +210,237 @@ h3 {
   background-color: var(--row-hover);
 }
 
+.item-row-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+}
+
 .item-name {
   font-weight: 500;
   color: var(--text-primary);
-  flex-shrink: 0;
-  margin-right: 1rem;
+  flex: 1;
+  min-width: 0;
   white-space: normal;
   word-break: break-word;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
-.item-details {
+.item-actions {
   display: flex;
   align-items: center;
-  gap: 1rem; /* Slightly reduced gap */
-  color: var(--text-secondary);
+  gap: 1.5rem;
+  flex-shrink: 0;
+}
+
+.quantity-control-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.quantity-value {
+  min-width: 32px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1;
+  padding: 0.25rem 0;
 }
 
 .item-unit-price {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-  min-width: 90px; /* Give it space */
   text-align: right;
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  min-width: 110px;
   white-space: nowrap;
 }
 
 .item-total {
-  font-weight: bold;
-  min-width: 100px;
   text-align: right;
+  font-weight: 700;
   color: var(--text-primary);
+  font-size: 1rem;
+  min-width: 120px;
+  white-space: nowrap;
+  letter-spacing: 0.2px;
 }
+
+/* Item details - now using Bootstrap utilities: d-flex align-items-center gap-4 */
+/* CSS removed - replaced with Bootstrap classes in HTML templates */
+
+/* Item unit price - now using Bootstrap utilities: text-end */
+/* CSS removed - replaced with Bootstrap classes and inline styles in HTML templates */
+
+/* Item total - now using Bootstrap utilities: text-end fw-bold */
+/* CSS removed - replaced with Bootstrap classes and inline styles in HTML templates */
 
 .remove-btn {
   background: transparent;
   color: var(--text-secondary);
-  font-size: 1.5rem;
-  padding:0;
+  font-size: 1.75rem;
+  padding: 0;
   border: none;
   cursor: pointer;
   line-height: 1;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
 }
 
 .remove-btn:hover {
   color: var(--danger-color);
+  transform: scale(1.1);
 }
 
-.empty-message {
-  color: var(--text-secondary);
-  text-align: center;
-  padding: 3rem 1rem;
-  font-size: 1.1rem;
+.remove-btn:active {
+  transform: scale(0.95);
 }
+
+/* Empty message - now using Bootstrap utilities: text-center w-100 */
+/* CSS removed - replaced with Bootstrap classes in HTML templates */
 
 /* --- CUSTOMER & SUMMARY SECTION --- */
+.order-summary-details {
+  margin-bottom: 2rem;
+}
 
 .customer-info-section {
-  /* Separator line */
-  border-top: 1px solid var(--border-color);
-  padding-top: 1rem;
-  margin-top: 1rem;
-  
+  padding-top: 0;
+  margin-top: 0;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  min-height: 240px;
 }
+
+.customer-info-section .section-heading {
+  margin-top: 0;
+  padding-top: 0;
+}
+/* Note: Keeping flexbox CSS as it's part of complex layout with flex-grow and min-height */
+
+/* Customer inputs span full width and match height with other inputs */
+.customer-info-section .form-control {
+  width: 100%;
+  height: 44px !important;
+  min-height: 44px !important;
+}
+
 /* --- FIX: Changed h4 to h3 --- */
 
-.summary-row {
+/* Summary row - now using Bootstrap utilities: d-flex justify-content-between align-items-center */
+/* CSS removed - replaced with Bootstrap classes in HTML templates */
+/* Note: .summary-row.total-row still has custom CSS for special styling */
+
+/* Total: bold modern emphasis with left accent bar */
+.summary-row.total-row {
+  background: linear-gradient(180deg, rgba(56, 161, 105, 0.06), rgba(56, 161, 105, 0.03));
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  margin-top: 1rem;
+  margin-bottom: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* --- FIX: Make "Items" row more prominent --- */
-  padding: 0.5rem 0;
-  color: var(--text-secondary);
-  font-weight: 600; /* Bolder */
-  font-size: 1.1rem; /* Slightly larger */
+  border: 1.5px solid rgba(56, 161, 105, 0.15);
+  position: relative;
+  box-shadow: 0 2px 8px rgba(56, 161, 105, 0.08);
+}
+/* Note: Keeping custom CSS for total-row as it has complex styling */
+
+/* little accent bar on the left to draw attention */
+.summary-row.total-row::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: calc(100% - 10px);
+  background: var(--success-color);
+  border-radius: 3px;
+  opacity: 0.95;
 }
 
-/* --- REMOVED: .summary-row.secondary --- */
+/* label (left) — a bit smaller but heavier */
+.summary-row.total-row span:first-child {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  letter-spacing: 0.2px;
+  margin-left: 16px;
+  /* room for accent bar */
+}
 
-/* --- REMOVED: .summary-row.total-row --- */
+/* amount (right) — larger and high-contrast */
+.summary-row.total-row span:last-child {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-right: 8px;
+  min-width: 100px;
+  text-align: right;
+  letter-spacing: 0.2px;
+}
 
+/* subtle pulse when value changes */
+@keyframes totalPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 6px 18px rgba(10, 20, 30, 0.04);
+  }
+
+  40% {
+    transform: scale(1.02);
+    box-shadow: 0 10px 24px rgba(10, 20, 30, 0.06);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 6px 18px rgba(10, 20, 30, 0.04);
+  }
+}
+
+/* Add an animated class you can toggle from TS when totals change.
+   If you don't toggle it from TS, it won't run automatically; it's optional.
+*/
+.summary-row.total-row.pulse {
+  animation: totalPulse 420ms ease;
+}
+
+.btn-icon{
+  width: 23px;
+  aspect-ratio: 1/1;
+  object-fit: contain;
+  margin-right: 0.35rem;
+  vertical-align: middle;
+  filter: brightness(0) invert(1);
+}
+
+
+/* Make the summary area visually separated on small screens too */
+@media (max-width: 991px) {
+  .summary-row.total-row {
+    padding: 0.65rem;
+    border-radius: 10px;
+  }
+}
 
 /* --- Quantity Controls --- */
-.quantity-control {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+/* Quantity control - now using Bootstrap utilities: d-flex align-items-center gap-3 */
+/* CSS removed - replaced with Bootstrap classes in HTML templates */
 
-.quantity-control span {
-  min-width: 20px;
-  text-align: center;
-  font-weight: 600;
-  color: var(--text-primary);
-}
+/* Quantity control span - now using Bootstrap utilities: text-center fw-semibold */
+/* CSS removed - replaced with Bootstrap classes and inline styles in HTML templates */
 
 .qty-btn {
   width: 24px;
@@ -206,6 +457,7 @@ h3 {
   justify-content: center;
   line-height: 1;
   transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .qty-btn:hover {
@@ -229,7 +481,23 @@ h3 {
   padding: 10px 20px;
   font-weight: 600;
   transition: all 0.3s ease;
-  margin-top: auto; 
+  margin-top: 1rem;
+  margin-bottom: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.place-order-btn .btn-icon {
+  margin-right: 0.35rem;
+  /* same spacing as add button */
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.place-order-btn:hover .btn-icon {
+  transform: scale(1.1);
 }
 
 .place-order-btn:hover:not(:disabled) {
@@ -247,17 +515,30 @@ h3 {
 .place-order-btn:disabled {
   background-color: #4a5568 !important;
   border-color: #4a5568 !important;
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
-  opacity: 0.65;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+  opacity: 0.7 !important;
+}
+
+.place-order-btn:disabled:hover {
+  background-color: #4a5568 !important;
+  border-color: #4a5568 !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 /* --- Button Spinner (for Place Order) --- */
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
+
 .button-spinner.small {
   width: 16px;
   height: 16px;
@@ -267,43 +548,536 @@ h3 {
   border-top-color: white;
   animation: spin 1s linear infinite;
 }
-.place-order-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+
+/* Card wrapper for skeleton transitions */
+.editor-card-wrapper {
+  position: relative;
+  min-height: 480px;
+  transition: min-height 0.3s ease-out;
+  /* Padding inherited from parent .card class */
 }
 
+.editor-skeleton {
+  opacity: 0.5;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  min-height: 480px;
+  z-index: 1;
+  padding: 30px;
+  padding-bottom: 30px;
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.editor-content {
+  position: relative;
+  z-index: 2;
+  animation: fadeInContent 0.5s ease-out forwards;
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+}
+
+.editor-content.overlaying {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 2;
+  min-height: 480px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.editor-card-wrapper:not(:has(.editor-skeleton)) {
+  min-height: auto;
+}
+
+/* Skeleton styles for order editor */
+.skeleton-label,
+.skeleton-input,
+.skeleton-button,
+.skeleton-button-large,
+.skeleton-item-name,
+.skeleton-item-price,
+.skeleton-item-total,
+.skeleton-remove-btn,
+.skeleton-qty-control,
+.skeleton-summary-label,
+.skeleton-summary-value {
+  background: linear-gradient(90deg, var(--input-bg) 0%, var(--border-color) 50%, var(--input-bg) 100%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+.skeleton-label {
+  height: 14px;
+  width: 80px;
+  margin-bottom: 0.5rem;
+}
+
+/* Ensure skeleton form structure matches actual form spacing */
+.editor-skeleton .mb-3 {
+  margin-bottom: 1rem;
+}
+
+.editor-skeleton .add-item-form {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+.skeleton-input {
+  height: 44px;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.skeleton-button {
+  height: 44px;
+  width: 80px;
+}
+
+.skeleton-button-large {
+  height: 44px;
+  width: 100%;
+  margin-top: 1rem;
+  margin-bottom: 0;
+}
+
+.skeleton-item-row {
+  pointer-events: none;
+}
+
+.skeleton-item-row:hover {
+  background-color: transparent !important;
+  cursor: default;
+}
+
+.skeleton-item-name {
+  height: 20px;
+  width: 150px;
+  flex-shrink: 0;
+  margin-right: 1rem;
+}
+
+.skeleton-qty-control {
+  height: 24px;
+  width: 80px;
+}
+
+.skeleton-item-price {
+  height: 16px;
+  width: 90px;
+  min-width: 90px;
+}
+
+.skeleton-item-total {
+  height: 18px;
+  width: 100px;
+  min-width: 100px;
+}
+
+.skeleton-remove-btn {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+}
+
+.skeleton-summary-label {
+  height: 18px;
+  width: 60px;
+}
+
+.skeleton-summary-value {
+  height: 18px;
+  width: 40px;
+}
+
+.skeleton-item-row .item-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
 
 /* --- Responsive Adjustments --- */
+/* Tablet and below (max-width: 991px) */
 @media (max-width: 991px) {
-  .header-row {
-     position: static;
-     flex-direction: column;
-     align-items: flex-start;
-     gap: 0.75rem;
-     margin-bottom: 1.5rem;
-  }
-  .back-button {
-      position: static;
-      transform: none;
-      margin-bottom: 0.5rem;
-  }
-  .header-row h1 {
-      width: 100%;
-      text-align: left;
-      font-size: 1.8rem;
+  .page-container {
+    padding: 15px;
   }
 
-  .item-details {
-      gap: 1rem;
+  .d-flex.align-items-center.mb-5 {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
   }
+
+  .back-button {
+    position: static !important;
+    transform: none !important;
+    margin-bottom: 0.5rem;
+    top: auto;
+    left: auto;
+    align-self: flex-start;
+  }
+
+  .d-flex.align-items-center.mb-5 h1 {
+    width: 100%;
+    text-align: left;
+    font-size: 1.8rem;
+  }
+
+  .row.g-4 {
+    gap: 1.5rem !important;
+  }
+
+  .item-row-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .item-actions {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .quantity-control-wrapper {
+    order: 1;
+  }
+
   .item-unit-price {
-      min-width: 70px;
-      font-size: 0.8rem;
+    min-width: auto;
+    font-size: 0.8rem;
+    order: 2;
   }
+
   .item-total {
-      min-width: 80px;
+    min-width: auto;
+    order: 3;
+  }
+
+  .remove-btn {
+    order: 4;
+    margin-left: auto;
+  }
+
+  .summary-row.total-row {
+    padding: 0.65rem 0.85rem;
+    border-radius: 8px;
+  }
+
+  .summary-row.total-row span:first-child {
+    font-size: 1rem;
+    margin-left: 14px;
+  }
+
+  .summary-row.total-row span:last-child {
+    font-size: 1.1rem;
+    min-width: 90px;
+    margin-right: 6px;
   }
 }
 
+/* Mobile landscape and below (max-width: 767px) */
+@media (max-width: 767px) {
+  .page-container {
+    padding: 15px;
+  }
+
+  .d-flex.align-items-center.mb-5 {
+    align-items: flex-start !important;
+  }
+
+  .d-flex.align-items-center.mb-5 h1 {
+    font-size: 1.75rem;
+  }
+
+  .back-button {
+    width: auto !important;
+    max-width: none !important;
+    justify-content: flex-start !important;
+    transform: none !important;
+    align-self: flex-start !important;
+    margin-right: auto !important;
+    margin-left: 0 !important;
+  }
+
+  .row.g-4 {
+    gap: 1rem !important;
+  }
+
+  .col-lg-7,
+  .col-lg-5 {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .section-heading {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.625rem;
+  }
+
+  .add-item-form {
+    margin-bottom: 1.5rem !important;
+  }
+
+  .add-item-form .row.g-2 {
+    gap: 0.75rem !important;
+  }
+
+  .add-item-form .col-12,
+  .add-item-form .col-6,
+  .add-item-form .col-sm-4,
+  .add-item-form .col-sm-2,
+  .add-item-form .col-sm-3 {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .add-item-btn {
+    width: 100%;
+  }
+
+  .items-list {
+    max-height: 350px;
+  }
+
+  .item-row {
+    padding: 1rem 0.75rem;
+  }
+
+  .item-name {
+    font-size: 0.9rem;
+  }
+
+  .item-unit-price {
+    font-size: 0.75rem;
+  }
+
+  .item-total {
+    font-size: 0.95rem;
+  }
+
+  .order-summary-details {
+    margin-bottom: 1.5rem;
+  }
+
+  .summary-row.total-row {
+    padding: 0.6rem 0.75rem;
+    margin-top: 0.875rem;
+  }
+
+  .summary-row.total-row span:first-child {
+    font-size: 0.95rem;
+    margin-left: 12px;
+  }
+
+  .summary-row.total-row span:last-child {
+    font-size: 1.05rem;
+    min-width: 80px;
+    margin-right: 4px;
+  }
+
+  .customer-info-section {
+    min-height: auto;
+  }
+
+  .customer-info-section .form-control {
+    font-size: 0.9rem;
+  }
+
+  .place-order-btn {
+    padding: 12px 20px;
+    font-size: 0.95rem;
+  }
+
+  .editor-card-wrapper,
+  .editor-skeleton,
+  .editor-content {
+    min-height: auto;
+  }
+}
+
+/* Small mobile (max-width: 480px) */
+@media (max-width: 480px) {
+  .page-container {
+    padding: 12px;
+  }
+
+  .d-flex.align-items-center.mb-5 {
+    align-items: flex-start !important;
+  }
+
+  .d-flex.align-items-center.mb-5 h1 {
+    font-size: 1.5rem;
+  }
+
+  .back-button {
+    width: auto !important;
+    max-width: none !important;
+    align-self: flex-start !important;
+    margin-right: auto !important;
+    margin-left: 0 !important;
+  }
+
+  .section-heading {
+    font-size: 1.1rem;
+    margin-bottom: 0.875rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .add-item-form .form-control,
+  .customer-info-section .form-control {
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 8px 12px !important;
+    font-size: 0.85rem !important;
+  }
+
+  .add-item-btn {
+    height: 40px !important;
+    min-height: 40px !important;
+    font-size: 0.9rem;
+  }
+
+  .items-list {
+    max-height: 300px;
+    min-height: 100px;
+  }
+
+  .item-row {
+    padding: 0.875rem 0.625rem;
+  }
+
+  .item-name {
+    font-size: 0.85rem;
+  }
+
+  .quantity-value {
+    font-size: 0.9rem;
+  }
+
+  .item-unit-price {
+    font-size: 0.7rem;
+  }
+
+  .item-total {
+    font-size: 0.9rem;
+  }
+
+  .qty-btn {
+    width: 22px;
+    height: 22px;
+    font-size: 0.9rem;
+  }
+
+  .summary-row.total-row {
+    padding: 0.55rem 0.65rem;
+    margin-top: 0.75rem;
+    border-radius: 8px;
+  }
+
+  .summary-row.total-row::before {
+    left: 5px;
+    width: 2.5px;
+    height: calc(100% - 8px);
+  }
+
+  .summary-row.total-row span:first-child {
+    font-size: 0.9rem;
+    margin-left: 10px;
+  }
+
+  .summary-row.total-row span:last-child {
+    font-size: 1rem;
+    min-width: 70px;
+    margin-right: 2px;
+  }
+
+  .order-summary-details {
+    margin-bottom: 1.25rem;
+  }
+
+  .customer-info-section .form-label {
+    font-size: 0.85rem;
+  }
+
+  .place-order-btn {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    margin-top: 0.75rem;
+  }
+
+  .empty-message {
+    font-size: 0.9rem !important;
+    padding: 1rem 0.75rem !important;
+  }
+
+  .empty-message-icon {
+    width: 24px !important;
+    height: 24px !important;
+  }
+}
+
+/* Very small mobile (max-width: 360px) */
+@media (max-width: 360px) {
+  .page-container {
+    padding: 10px;
+  }
+
+  .d-flex.align-items-center.mb-5 {
+    align-items: flex-start !important;
+  }
+
+  .d-flex.align-items-center.mb-5 h1 {
+    font-size: 1.35rem;
+  }
+
+  .back-button {
+    width: auto !important;
+    max-width: none !important;
+    align-self: flex-start !important;
+    margin-right: auto !important;
+    margin-left: 0 !important;
+  }
+
+  .section-heading {
+    font-size: 1rem;
+  }
+
+  .add-item-form .form-control,
+  .customer-info-section .form-control {
+    font-size: 0.8rem !important;
+    padding: 7px 10px !important;
+  }
+
+  .item-row {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .summary-row.total-row {
+    padding: 0.5rem 0.55rem;
+  }
+
+  .summary-row.total-row span:first-child {
+    font-size: 0.85rem;
+  }
+
+  .summary-row.total-row span:last-child {
+    font-size: 0.95rem;
+    min-width: 60px;
+  }
+}

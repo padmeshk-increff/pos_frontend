@@ -1,19 +1,12 @@
-/*
- * Styles specific to the Product Management page.
- */
+/* ==========================================================================
+   PRODUCT PAGE - Component Specific Styles Only
+   Common styles moved to styles.css (skeleton, pagination, table-wrapper, etc.)
+   ========================================================================== */
 
-/* --- Header Row Adjustments --- */
-.header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2.5rem;
-}
-
+/* Header actions - can use Bootstrap flex utilities */
 .header-actions {
   display: flex;
   flex-wrap: wrap;
-  /* Allow buttons to wrap on small screens */
   gap: 1rem;
 }
 
@@ -28,101 +21,46 @@
   box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3);
 }
 
-
-/* --- Controls Card Specifics --- */
-.controls-card {
-  padding: 30px;
-}
-
-/* Filter Grid */
-.filter-grid {
-  display: grid;
+/* Filter grid - specific to product page */
+.card.controls-card {
+  /* Override: product-page uses grid layout, not flex */
+  display: grid !important;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1.5rem;
   align-items: flex-end;
+  flex-wrap: unset !important; /* Remove flex-wrap from common styles */
+  margin-bottom: 2rem !important; /* Add margin between filter container and table */
+}
+
+.filter-grid {
+  /* Make filter-grid transparent to grid layout */
+  display: contents;
 }
 
 .filter-group {
-  display: flex;
-  flex-direction: column;
+  /* Override: product-page uses grid, not flex */
   min-width: 150px;
+  flex: unset !important; /* Remove flex from common styles */
 }
 
-.filter-group label {
-  color: var(--text-secondary);
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
-  text-align: left;
-}
+/* Filter group actions - now using Bootstrap utilities in HTML */
 
-.filter-input {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 6px;
-  background-color: var(--input-bg);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  box-sizing: border-box;
-  height: 43.6px;
-  font-size: 0.9rem;
-  transition: all var(--transition-speed);
-  appearance: none;
-}
+/* Reset and search button styles are now handled by global .button-secondary and .button-primary */
+/* Height alignment is handled globally in styles.css */
 
-.filter-input:focus {
-  outline: none;
-  border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
-}
+/* Border glow effect is now in styles.css */
 
-/* Style calendar icon for date inputs */
-.filter-input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-  opacity: 0.7;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-.filter-input[type="date"]::-webkit-calendar-picker-indicator:hover {
-  opacity: 1;
-}
-
-/* Filter actions group */
-.filter-group-actions {
-  flex-shrink: 0;
-  display: flex;
-  gap: 1rem;
-  align-items: flex-end;
-  grid-column: 1 / -1;
-  justify-content: flex-end;
-}
-
-.reset-button,
-.search-button {
-  padding: 10px 20px;
-  font-size:0.9rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* --- Product Table Specifics --- */
-
+/* Product table specific styles */
 .table-card {
   position: relative;
-  /* This min-height prevents collapse on load AND fixes overflow */
   min-height: 400px;
 }
+
 .table-container {
   overflow-x: auto;
 }
 
-.product-table {
-  width: 100%;
-  border-collapse: collapse;
-}
+/* Base table styles are now in styles.css */
 
 .product-table th:nth-child(1) {
   width: 80px;
@@ -152,27 +90,25 @@
   width: 100px;
 }
 
-.product-table th,
-.product-table td {
-  padding: 1rem 1.25rem;
+/* Base table styles are now in styles.css */
+.product-table th {
+  text-align: left;
+}
+
+.product-table th.text-center {
   text-align: center;
-  border-bottom: 1px solid var(--border-color);
-  vertical-align: middle;
 }
 
 .product-table td {
-  color: var(--text-secondary);
   white-space: normal;
   overflow: visible;
   text-overflow: clip;
   word-break: break-word;
+  text-align: left;
 }
 
-.product-table th:nth-child(2),
-.product-table td[data-label="Product"],
-.product-table th:nth-child(3),
-.product-table td[data-label="Client"] {
-  text-align: left;
+.product-table td.text-center {
+  text-align: center;
 }
 
 .product-table td[data-label="Product"] {
@@ -182,18 +118,6 @@
 
 .data-table th {
   white-space: nowrap;
-  color: var(--text-primary);
-  font-weight: 600;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-}
-
-.product-table tbody tr {
-  transition: background-color var(--transition-speed) ease;
-}
-
-.product-table tbody tr:hover {
-  background-color: var(--row-hover);
 }
 
 .product-image {
@@ -234,61 +158,38 @@
   text-align: center;
 }
 
-.action-button {
-  padding: 6px 12px;
-  border: 1px solid var(--border-color);
-  background: transparent;
-  color: var(--text-secondary);
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s;
-  display: inline-block;
+/* Skeleton specific widths for product page */
+.skeleton-name {
+  width: 150px;
 }
 
-.action-button.edit:hover {
-  background: var(--accent-color);
-  border-color: var(--accent-color);
-  color: white;
+.skeleton-client {
+  width: 120px;
 }
 
-/* --- Pagination Controls Styles --- */
-.pagination-controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  padding-top: 1.5rem;
-
-
-  color: var(--text-secondary);
+.skeleton-barcode {
+  width: 100px;
 }
 
-.pagination-controls button {
-  padding: 8px 16px;
-  border: none;
-  background-color: var(--border-color);
-  color: var(--text-primary);
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all var(--transition-speed) ease;
+.skeleton-mrp {
+  width: 80px;
 }
 
-.pagination-controls button:hover:not(:disabled) {
-  background-color: #6b7280;
+.skeleton-inventory {
+  width: 70px;
+  border-radius: 9999px;
 }
 
-.pagination-controls button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.skeleton-actions {
+  width: 60px;
 }
 
-.page-info {
-  font-weight: 600;
+.skeleton-row td.actions-cell {
+  padding-right: 0 !important;
+  padding-left: 0 !important;
 }
 
-/* --- MODAL STYLES --- */
+/* Modal styles specific to product page */
 .modal-content.upload-modal p {
   color: var(--text-secondary);
   margin-bottom: 1.5rem;
@@ -296,10 +197,8 @@
   line-height: 1.6;
 }
 
-/* --- NEW: Sample Download Link Styles --- */
 .sample-download-container {
   margin-bottom: 1.5rem;
-  /* Space below link */
 }
 
 .sample-download-link {
@@ -311,7 +210,6 @@
   cursor: pointer;
   padding: 5px 0;
   display: inline-flex;
-  /* Align icon and text */
   align-items: center;
   gap: 6px;
   transition: color 0.2s ease;
@@ -327,9 +225,6 @@
   height: 16px;
   flex-shrink: 0;
 }
-
-/* --- END NEW --- */
-
 
 .modal-content.upload-modal .file-input-wrapper {
   display: flex;
@@ -355,7 +250,7 @@
   transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
 }
 
-.modal-content.upload-modal .custom-file-input:focus+.file-input-label {
+.modal-content.upload-modal .custom-file-input:focus + .file-input-label {
   border-color: var(--accent-color);
   box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
 }
@@ -384,133 +279,104 @@
   width: 100%;
 }
 
-/* Modal Form Group Label (Add/Edit) */
-.modal-body .form-group label {
-  display: block;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 0.5rem;
-}
+/* Modal form labels are now in styles.css */
 
 .modal-body .form-group {
   margin-bottom: 1.25rem;
 }
 
-/* Form Control Placeholder Color */
-.form-control::placeholder {
-  color: var(--text-secondary);
-}
+/* ==========================================================================
+   RESPONSIVE STYLES
+   ========================================================================== */
 
-/* Loading/Empty States */
-.loading-state,
-.empty-state {
-  text-align: center;
-  padding: 5rem 0;
-  color: var(--text-secondary);
-  font-size: 1.1rem;
-}
-
-.spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid var(--border-color);
-  border-top: 5px solid var(--accent-color);
-  border-radius: 50%;
-  margin: 0 auto 1.5rem auto;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.content-stage {
-  position: relative;
-  /* This sets the minimum height of the card during transitions */
-  min-height: 400px;
-}
-
-.content-wrapper {
-  /* This holds the table/pagination content */
-  width: 100%;
-}
-
-.loader-wrapper,
-.content-wrapper {
-  /* This stacks the loader and content on top of each other */
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.loader-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  text-align: center;
-  color: var(--text-secondary);
-  font-size: 1.1rem;
-
-  /* --- THIS IS THE FIX --- */
-  /* It floats on top of the card */
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  /* It guarantees the card's min-height */
-  min-height: 400px;
-  /* --- END OF FIX --- */
-
-  box-sizing: border-box;
-}
-
-/* This rule can now be simpler */
-.empty-state {
-  text-align: center;
-  color: var(--text-secondary);
-  font-size: 1.1rem;
-  /* Remove padding, as .loader-wrapper handles spacing */
-  padding: 0;
-}
-
-.empty-state h2 {
-  color: var(--text-primary);
-  margin-bottom: 0.5rem;
-}
-
-/* Responsive Adjustments */
-@media (max-width: 767px) {
-  .header-row {
-    flex-direction: column;
-    align-items: flex-start;
+/* Tablet and below (max-width: 991px) */
+@media (max-width: 991px) {
+  .card.controls-card {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 1rem;
+  }
+
+  .filter-group {
+    flex: 0 0 auto !important;
+    min-width: unset !important;
+  }
+
+  .product-table th,
+  .product-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Mobile landscape and below (max-width: 767px) */
+@media (max-width: 767px) {
+  /* Header responsive */
+  .page-container > .d-flex.justify-content-between {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 1rem;
+  }
+
+  .page-container > .d-flex.justify-content-between h1 {
+    margin-bottom: 0;
+    font-size: 1.75rem;
   }
 
   .header-actions {
     width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
   }
 
   .header-button {
     width: 100%;
   }
 
+  /* Filter controls responsive */
+  .card.controls-card {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .filter-group {
+    flex: 0 0 auto !important;
+    min-width: unset !important;
+    width: 100%;
+  }
+
+  .filter-group label {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .filter-input {
+    font-size: 0.9rem;
+  }
+
+  .card.controls-card > div:last-child {
+    width: 100%;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .card.controls-card > div:last-child button {
+    width: 100%;
+  }
+
+  /* Table responsive */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .product-table {
+    min-width: 700px;
+  }
+
   .product-table th,
   .product-table td {
-    padding: 0.75rem 0.5rem;
+    padding: 0.625rem 0.5rem;
     font-size: 0.85rem;
   }
 
@@ -520,26 +386,143 @@
   }
 
   .action-button {
-    padding: 4px 8px;
-    font-size: 0.8rem;
+    padding: 8px 16px;
+    font-size: 0.875rem;
+    height: 38px;
+    min-height: 38px;
   }
 
+  /* Pagination responsive */
   .pagination-controls {
+    flex-direction: row;
     gap: 0.5rem;
+    flex-wrap: wrap;
   }
 
-  .pagination-controls button {
-    padding: 6px 12px;
-    font-size: 0.9rem;
+  .pagination-btn {
+    flex: 1 1 auto;
+    min-width: 80px;
+    justify-content: center;
+    padding: 10px 12px;
   }
 
-  .page-info {
-    font-size: 0.9rem;
+  .pagination-text {
+    display: none;
+  }
+
+  .pagination-info {
+    order: -1;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  /* Modal responsive */
+  .modal-content {
+    width: 95%;
+    max-width: 95%;
+    margin: 1rem auto;
+    padding: 1.5rem;
+  }
+
+  .modal-content h2 {
+    font-size: 1.25rem;
+  }
+
+  .modal-body {
+    font-size: 0.95rem;
+  }
+
+  .modal-content > div:last-child {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .modal-content > div:last-child button {
+    width: 100%;
   }
 }
 
+/* Small mobile (max-width: 480px) */
 @media (max-width: 480px) {
+  .page-container {
+    padding: 15px;
+  }
+
+  .page-container > div:first-child h1 {
+    font-size: 1.5rem;
+  }
+
   .header-actions {
     grid-template-columns: 1fr;
+  }
+
+  /* Filter controls */
+  .card.controls-card {
+    padding: 1.25rem !important;
+  }
+
+  .filter-group label {
+    font-size: 0.85rem;
+  }
+
+  .filter-input {
+    font-size: 0.85rem;
+    padding: 0.5rem;
+  }
+
+  /* Table */
+  .product-table th,
+  .product-table td {
+    padding: 0.5rem 0.375rem;
+    font-size: 0.8rem;
+  }
+
+  .product-image {
+    width: 35px;
+    height: 35px;
+  }
+
+  .action-button {
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    min-height: 30px;
+  }
+
+  /* Empty state */
+  .empty-state-wrapper {
+    padding: 2rem 1rem !important;
+  }
+
+  .empty-state-wrapper svg {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  .empty-state-wrapper h2 {
+    font-size: 1.25rem;
+  }
+
+  .empty-state-wrapper p {
+    font-size: 0.9rem;
+  }
+
+  /* Modal */
+  .modal-content {
+    padding: 1.25rem;
+  }
+}
+
+/* Very small mobile (max-width: 360px) */
+@media (max-width: 360px) {
+  .product-table {
+    min-width: 650px;
+  }
+
+  .product-table th,
+  .product-table td {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.75rem;
   }
 }

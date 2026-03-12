@@ -1,29 +1,78 @@
-/* Styles specific to the Report Page */
+/* ==========================================================================
+   REPORT PAGE - Component Specific Styles Only
+   Common styles moved to styles.css (filter controls, etc.)
+   ========================================================================== */
 
-/* Inherit global styles for page-container, header-row, card etc. */
-
+/* Border glow effect for reports card */
 .reports-card {
-  padding: 40px; /* More padding for distinct sections */
+  padding: 40px !important; /* Reports card uses larger padding (40px vs 30px) */
+  position: relative !important;
+  overflow: visible !important;
+}
+
+.reports-card::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 13px;
+  background: radial-gradient(
+    circle 400px at var(--card-cursor-x, 50%) var(--card-cursor-y, 50%),
+    rgba(59, 130, 246, 1),
+    rgba(59, 130, 246, 0.9),
+    rgba(59, 130, 246, 0.6),
+    rgba(59, 130, 246, 0.3),
+    transparent 50%
+  );
+  z-index: -1;
+  opacity: var(--card-glow-opacity, 0);
+  transition: opacity 0.4s cubic-bezier(0.4, 0.0, 0.2, 1),
+              background 0.15s cubic-bezier(0.4, 0.0, 0.2, 1);
+  pointer-events: none;
+  filter: blur(2px);
+  mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  padding: 2px;
+}
+
+.reports-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: var(--card-bg-lighter);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.reports-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .report-section {
-  margin-bottom: 2.5rem; /* Space below each section */
+  margin-bottom: 2.5rem;
 }
+
 .report-section:last-child {
-  margin-bottom: 0; /* No space after the last section */
+  margin-bottom: 0;
 }
 
 .report-title {
-  font-size: 1.5rem; /* Slightly smaller than page title */
+  font-size: 1.5rem;
   color: var(--text-primary);
   margin-bottom: 0.75rem;
   padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--border-color);
 }
 
-/* --- FIX: Add margin-top to second section's title for separation --- */
 .report-section:nth-child(2) .report-title {
-   margin-top: 2.5rem; /* Creates space equivalent to removed hr */
+  margin-top: 2.5rem;
 }
 
 .report-description {
@@ -31,64 +80,35 @@
   color: var(--text-secondary);
   margin-bottom: 1.5rem;
   line-height: 1.6;
-  max-width: 800px; /* Limit description width */
+  max-width: 800px;
 }
 
 .report-controls {
   display: flex;
-  flex-direction: column; /* Stack controls vertically by default */
+  flex-direction: column;
   gap: 1.5rem;
 }
 
-/* On wider screens, place date inputs and button side-by-side */
 @media (min-width: 768px) {
   .report-controls {
     flex-direction: row;
-    align-items: flex-end; /* Align button bottom with inputs */
+    align-items: flex-end;
     justify-content: space-between;
   }
 }
 
 .date-inputs {
   display: flex;
-  gap: 1.5rem; /* Space between date inputs */
-  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  gap: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .filter-group {
-  flex: 1 1 200px; /* Allow inputs to grow but have a base size */
-  min-width: 180px; /* Prevent inputs becoming too small */
+  flex: 1 1 200px;
+  min-width: 180px;
 }
-
-.filter-group label {
-  display: block;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 0.5rem;
-}
-
-.filter-input {
-  /* Inherits styles from global .form-control */
-  width: 100%;
-}
-
-/* --- NEW: Style Calendar Icon for Date Inputs --- */
-.filter-input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1); /* Inverts the default black icon to white */
-  opacity: 0.7; /* Make it slightly subtle */
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-.filter-input[type="date"]::-webkit-calendar-picker-indicator:hover {
-  opacity: 1; /* Full white on hover */
-}
-/* --- END NEW STYLE --- */
-
 
 .download-button {
-  /* Use primary button styles but adjust padding/height */
   padding: 10px 20px;
   background: var(--accent-color);
   color: white;
@@ -97,12 +117,11 @@
   cursor: pointer;
   font-weight: 600;
   transition: all var(--transition-speed) ease;
-  display: inline-flex; /* Use inline-flex for icon alignment */
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  white-space: nowrap; /* Prevent button text wrapping */
-  /* Ensure height matches inputs if needed */
-   height: calc(1.5em + 0.75rem + 2px + 2px); /* Match default BS input height */
+  white-space: nowrap;
+  height: calc(1.5em + 0.75rem + 2px + 2px);
 }
 
 .download-button:hover:not(:disabled) {
@@ -112,7 +131,7 @@
 }
 
 .download-button:disabled {
-  background-color: #4a5568 !important; /* Use disabled color */
+  background-color: #4a5568 !important;
   cursor: not-allowed;
   opacity: 0.65;
   box-shadow: none;
@@ -120,29 +139,19 @@
 }
 
 .download-button svg {
-  flex-shrink: 0; /* Prevent icon shrinking */
+  flex-shrink: 0;
 }
 
-/* Spinner inside button */
 .button-spinner.small {
   width: 18px;
   height: 18px;
-  border-width: 2px; /* Smaller border */
-  border-color: rgba(255, 255, 255, 0.3); /* Lighter border color */
-  border-top-color: white; /* Spinner color */
-  margin: 0; /* Remove auto margin */
-  /* --- ADDED: Animation for spinner --- */
+  border-width: 2px;
+  border-color: rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  margin: 0;
   animation: spin 1s linear infinite;
 }
-/* --- ADDED: spin keyframes --- */
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
 
-
-/* Adjust layout specifically for inventory section if needed */
 .inventory-controls {
-  justify-content: flex-start; /* Align button left if desired */
+  justify-content: flex-start;
 }
-

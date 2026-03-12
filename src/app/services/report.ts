@@ -27,7 +27,6 @@ export class ReportService {
     let params = new HttpParams()
       .set('start', startIso)
       .set('end', endIso);
-    console.log("Requesting Sales Report with params:", params.toString());
     return this.http.get(`${this.apiUrl}/sales`, {
       params: params,
       responseType: 'blob'
@@ -38,7 +37,6 @@ export class ReportService {
    * Fetches the Inventory Report TSV file from the backend.
    */
   downloadInventoryReport(): Observable<Blob> {
-    console.log("Requesting Inventory Report");
     return this.http.get(`${this.apiUrl}/inventory`, {
       responseType: 'blob'
     });

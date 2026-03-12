@@ -16,8 +16,8 @@ import { Role } from './models/role.enum';     // 2. Import the Role enum
 
 export const routes: Routes = [
   // --- PUBLIC ROUTES ---
-  { path: 'login', component: LoginPageComponent },
-  { path: 'signup', component: SignupPageComponent },
+  { path: 'login', component: LoginPageComponent, data: { animation: 'login' } },
+  { path: 'signup', component: SignupPageComponent, data: { animation: 'signup' } },
 
   // --- PROTECTED ROUTES ---
   {

@@ -1,25 +1,37 @@
 <nav class="navbar">
-  <a class="nav-brand" routerLink="/">
+  <a class="nav-brand" routerLink="/" data-text="PoS App">
     <!-- <i class="icon-pos"></i> --> <!-- Optional icon -->
     <span>PoS App</span>
   </a>
 
   <!-- Desktop Navigation Links -->
-  <div class="nav-links desktop-nav-links">
-    <a routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">Dashboard</a>
-    <a routerLink="/orders" routerLinkActive="active-link">Orders</a>
-    <a routerLink="/products" routerLinkActive="active-link">Products</a>
-    <a routerLink="/clients" routerLinkActive="active-link">Clients</a>
-    @if (userRole === 'SUPERVISOR') {
-      <a routerLink="/reports" routerLinkActive="active-link">Reports</a>
-    }
-  </div>
+  @if (currentUser) {
+    <div class="nav-links desktop-nav-links">
+      @for (link of navLinks; track link.route) {
+        <a 
+          [routerLink]="link.route" 
+          routerLinkActive="active-link" 
+          [routerLinkActiveOptions]="{exact: link.exact}"
+          [@navLinkFadeIn]="navLinksState[link.route] || 'visible'">
+          {{ link.label }}
+        </a>
+      }
+      @if (userRole === 'SUPERVISOR') {
+        <a 
+          routerLink="/reports" 
+          routerLinkActive="active-link"
+          [@navLinkFadeIn]="navLinksState['/reports'] || 'visible'">
+          Reports
+        </a>
+      }
+    </div>
+  }
 
   <!-- User Section: Avatar + NEW Burger Menu -->
   <div class="user-section">
     @if (currentUser) {
       <!-- Profile Avatar Button -->
-      <button class="profile-avatar" (click)="toggleProfileDropdown($event)">
+      <button class="profile-avatar" [class.active]="isProfileDropdownOpen" (click)="toggleProfileDropdown($event)">
         {{ getInitials(userEmail) }}
       </button>
 
@@ -73,6 +85,3 @@
     }
   </div>
 }
-
-
-

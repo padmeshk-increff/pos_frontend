@@ -1,4 +1,8 @@
-<div class="auth-container">
+<div class="auth-container"
+     [style.--cursor-x]="cursorX + 'px'"
+     [style.--cursor-y]="cursorY + 'px'"
+     [style.--glow-intensity]="glowIntensity">
+  <canvas #particleCanvas class="particle-background"></canvas>
   <div class="card auth-card">
     <h1 class="auth-title">Increff POS</h1>
     <h3 class="auth-subtitle">Create Your Account</h3>

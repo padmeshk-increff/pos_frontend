@@ -1,0 +1,33 @@
+/* Cursor glow effect - velocity-based, reacts to cursor movement speed */
+.auth-container {
+  position: relative;
+}
+
+.auth-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+    circle 500px at var(--cursor-x, 50%) var(--cursor-y, 50%),
+    rgba(59, 130, 246, calc(var(--glow-intensity, 0.2) * 0.25)),
+    rgba(59, 130, 246, calc(var(--glow-intensity, 0.2) * 0.15)),
+    rgba(59, 130, 246, calc(var(--glow-intensity, 0.2) * 0.08)),
+    transparent 70%
+  );
+  opacity: var(--glow-intensity, 0.2);
+  transition: opacity 0.2s cubic-bezier(0.4, 0.0, 0.2, 1),
+              background 0.15s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.auth-card {
+  position: relative;
+  z-index: 1;
+  /* Padding inherited from base .card class */
+}
+
+

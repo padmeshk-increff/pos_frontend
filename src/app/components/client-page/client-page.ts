@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChildren, QueryList, ElementRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { finalize } from 'rxjs/operators';
@@ -9,6 +9,7 @@ import { ClientService } from '../../services/client';
 import { Client, ClientForm } from '../../models/client.model';
 import { ToastService } from '../../services/toast';
 import { PaginationData } from '../../models/pagination.model'; // Import pagination model
+import { handleHttpError } from '../../utils/error-handler';
 
 @Component({
   selector: 'app-client-page',
@@ -21,7 +22,7 @@ import { PaginationData } from '../../models/pagination.model'; // Import pagina
       transition(':enter', [
         style({ opacity: 0, transform: 'translateY(15px)' }),
         // Fade in shell with no delay
-        animate('0.6s ease-out',
+        animate('0.5s ease-out',
           style({ opacity: 1, transform: 'translateY(0)' })
         )
       ])
@@ -30,30 +31,35 @@ import { PaginationData } from '../../models/pagination.model'; // Import pagina
       // :enter (fade in)
       transition(':enter', [
         style({ opacity: 0 }),
-        // Wait 300ms (for :leave) then fade in
-        animate('0.5s 0.3s ease-out', style({ opacity: 1 }))
+        // Smooth fade in
+        animate('0.3s 0.2s ease-out', style({ opacity: 1 }))
       ]),
       // :leave (fade out)
       transition(':leave', [
-        // Fade out for 300ms
-        animate('0.3s ease-in', style({ opacity: 0 }))
+        // Smooth fade out
+        animate('0.2s ease-in', style({ opacity: 0 }))
+      ])
+    ]),
+    trigger('fadeIn', [
+      // For content that fades in after skeleton
+      transition(':enter', [
+        style({ opacity: 0 }),
+        // Wait for skeleton fade out, then fade in
+        animate('0.3s 0.2s ease-out', style({ opacity: 1 }))
       ])
     ])
   ]
 })
-export class ClientPageComponent implements OnInit {
+export class ClientPageComponent implements OnInit, AfterViewInit {
+  // ViewChildren for glow effect
+  @ViewChildren('tableCard') tableCards!: QueryList<ElementRef<HTMLElement>>;
   // --- STATE ---
   public clients: Client[] = []; // This list is now just for the current page
   public isLoading = true;
+  public showContent = false; // Controls when to show content after skeleton fade-out
   public isSaving = false;
   public searchTerm: string = ''; // The value in the search box
   public activeSearchTerm: string = ''; // The filter currently applied
-
-  // Add these new properties to the component class (near other state)
-  public showSkeleton = false;
-  public showLoaderOverlay = false;
-  private loaderOverlayTimer: any = null;
-  private pendingFetchedData: PaginationData<Client> | null = null;
 
 
   // --- Pagination State ---
@@ -79,88 +85,543 @@ export class ClientPageComponent implements OnInit {
     this.fetchClients();
   }
 
+  ngAfterViewInit(): void {
+    // Set up border glow effect for tables and search inputs
+    this.setupGlowEffect();
+  }
+
+  private setupGlowEffect(): void {
+    const setupElements = () => {
+      // Get all table cards, controls cards, and search inputs
+      const tableCards = document.querySelectorAll('.table-card');
+      const controlsCards = document.querySelectorAll('.controls-card');
+      const searchInputs = document.querySelectorAll('.filter-input, .search-input');
+
+      // Setup glow effect for table cards
+      tableCards.forEach((card) => {
+        if ((card as any).__glowSetup) return;
+        (card as any).__glowSetup = true;
+
+        let lastMoveTime = 0;
+        let fadeAnimationFrame: number | null = null;
+        let positionAnimationFrame: number | null = null;
+        let cachedRect: DOMRect | null = null;
+        let rectCacheTime = 0;
+        
+        let targetX = 0;
+        let targetY = 0;
+        let currentX = 0;
+        let currentY = 0;
+        
+        let lastX = 0;
+        let lastY = 0;
+        let lastTime = 0;
+        const velocityHistory: number[] = [];
+        const MAX_VELOCITY_HISTORY = 5;
+        let currentVelocity = 0;
+        
+        let targetSize = 200;
+        let currentSize = 200;
+        
+        const fadeOutDelay = 200;
+        const fadeOutDuration = 300;
+        const RECT_CACHE_DURATION = 100;
+        const SMOOTH_FOLLOW_SPEED = 0.15;
+        const MIN_GLOW_SIZE = 150;
+        const MAX_GLOW_SIZE = 500;
+        const MAX_VELOCITY = 2000;
+
+        const getCachedRect = (): DOMRect => {
+          const now = performance.now();
+          if (!cachedRect || (now - rectCacheTime) > RECT_CACHE_DURATION) {
+            cachedRect = (card as HTMLElement).getBoundingClientRect();
+            rectCacheTime = now;
+          }
+          return cachedRect;
+        };
+
+        const lerp = (start: number, end: number, factor: number): number => {
+          return start + (end - start) * factor;
+        };
+
+        const calculateVelocity = (x: number, y: number, time: number): number => {
+          if (lastTime === 0) {
+            lastX = x;
+            lastY = y;
+            lastTime = time;
+            return 0;
+          }
+          
+          const deltaTime = (time - lastTime) / 1000;
+          if (deltaTime <= 0) return currentVelocity;
+          
+          const deltaX = x - lastX;
+          const deltaY = y - lastY;
+          const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+          const instantVelocity = distance / deltaTime;
+          
+          velocityHistory.push(instantVelocity);
+          if (velocityHistory.length > MAX_VELOCITY_HISTORY) {
+            velocityHistory.shift();
+          }
+          
+          const avgVelocity = velocityHistory.reduce((a, b) => a + b, 0) / velocityHistory.length;
+          
+          lastX = x;
+          lastY = y;
+          lastTime = time;
+          
+          return avgVelocity;
+        };
+
+        const updateGlowSize = (velocity: number): void => {
+          const normalizedVelocity = Math.min(velocity / MAX_VELOCITY, 1);
+          const easedVelocity = Math.pow(normalizedVelocity, 0.6);
+          targetSize = MIN_GLOW_SIZE + (MAX_GLOW_SIZE - MIN_GLOW_SIZE) * easedVelocity;
+        };
+
+        const animateGlow = () => {
+          const now = performance.now();
+          const timeSinceMove = now - lastMoveTime;
+          
+          currentX = lerp(currentX, targetX, SMOOTH_FOLLOW_SPEED);
+          currentY = lerp(currentY, targetY, SMOOTH_FOLLOW_SPEED);
+          currentSize = lerp(currentSize, targetSize, 0.1);
+          
+          // Clamp lerped values to card bounds to prevent overflow
+          const rect = getCachedRect();
+          const clampedX = Math.max(0, Math.min(currentX, rect.width));
+          const clampedY = Math.max(0, Math.min(currentY, rect.height));
+          
+          (card as HTMLElement).style.setProperty('--card-cursor-x', `${clampedX}px`);
+          (card as HTMLElement).style.setProperty('--card-cursor-y', `${clampedY}px`);
+          (card as HTMLElement).style.setProperty('--card-glow-size', `${currentSize}px`);
+          
+          if (timeSinceMove < fadeOutDelay) {
+            (card as HTMLElement).style.setProperty('--card-glow-opacity', '1');
+            positionAnimationFrame = requestAnimationFrame(animateGlow);
+          } else if (timeSinceMove < fadeOutDelay + fadeOutDuration) {
+            const fadeProgress = (timeSinceMove - fadeOutDelay) / fadeOutDuration;
+            const opacity = 1 - fadeProgress;
+            (card as HTMLElement).style.setProperty('--card-glow-opacity', opacity.toString());
+            positionAnimationFrame = requestAnimationFrame(animateGlow);
+          } else {
+            (card as HTMLElement).style.setProperty('--card-glow-opacity', '0');
+            positionAnimationFrame = null;
+          }
+        };
+
+        const handleMouseMove = (e: MouseEvent) => {
+          const now = performance.now();
+          const rect = getCachedRect();
+          // Clamp relative position to card bounds to prevent overflow
+          const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+          const y = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
+          
+          targetX = x;
+          targetY = y;
+          currentVelocity = calculateVelocity(x, y, now);
+          updateGlowSize(currentVelocity);
+          lastMoveTime = now;
+          
+          if (!positionAnimationFrame) {
+            positionAnimationFrame = requestAnimationFrame(animateGlow);
+          }
+        };
+
+        const handleMouseLeave = () => {
+          if (fadeAnimationFrame) {
+            cancelAnimationFrame(fadeAnimationFrame);
+            fadeAnimationFrame = null;
+          }
+          if (positionAnimationFrame) {
+            cancelAnimationFrame(positionAnimationFrame);
+            positionAnimationFrame = null;
+          }
+          
+          cachedRect = null;
+          lastMoveTime = 0;
+          lastTime = 0;
+          velocityHistory.length = 0;
+          currentVelocity = 0;
+          targetSize = MIN_GLOW_SIZE;
+          
+          (card as HTMLElement).style.setProperty('--card-glow-opacity', '0');
+        };
+
+        card.addEventListener('mousemove', handleMouseMove as EventListener);
+        card.addEventListener('mouseleave', handleMouseLeave);
+      });
+
+      // Setup glow effect for controls cards (filter container)
+      controlsCards.forEach((card) => {
+        if ((card as any).__glowSetup) return;
+        (card as any).__glowSetup = true;
+
+        let lastMoveTime = 0;
+        let fadeAnimationFrame: number | null = null;
+        let positionAnimationFrame: number | null = null;
+        let cachedRect: DOMRect | null = null;
+        let rectCacheTime = 0;
+        
+        let targetX = 0;
+        let targetY = 0;
+        let currentX = 0;
+        let currentY = 0;
+        
+        let lastX = 0;
+        let lastY = 0;
+        let lastTime = 0;
+        const velocityHistory: number[] = [];
+        const MAX_VELOCITY_HISTORY = 5;
+        let currentVelocity = 0;
+        
+        let targetSize = 200;
+        let currentSize = 200;
+        
+        const fadeOutDelay = 200;
+        const fadeOutDuration = 300;
+        const RECT_CACHE_DURATION = 100;
+        const SMOOTH_FOLLOW_SPEED = 0.15;
+        const MIN_GLOW_SIZE = 150;
+        const MAX_GLOW_SIZE = 500;
+        const MAX_VELOCITY = 2000;
+
+        const getCachedRect = (): DOMRect => {
+          const now = performance.now();
+          if (!cachedRect || (now - rectCacheTime) > RECT_CACHE_DURATION) {
+            cachedRect = (card as HTMLElement).getBoundingClientRect();
+            rectCacheTime = now;
+          }
+          return cachedRect;
+        };
+
+        const lerp = (start: number, end: number, factor: number): number => {
+          return start + (end - start) * factor;
+        };
+
+        const calculateVelocity = (x: number, y: number, time: number): number => {
+          if (lastTime === 0) {
+            lastX = x;
+            lastY = y;
+            lastTime = time;
+            return 0;
+          }
+          
+          const deltaTime = (time - lastTime) / 1000;
+          if (deltaTime <= 0) return currentVelocity;
+          
+          const deltaX = x - lastX;
+          const deltaY = y - lastY;
+          const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+          const instantVelocity = distance / deltaTime;
+          
+          velocityHistory.push(instantVelocity);
+          if (velocityHistory.length > MAX_VELOCITY_HISTORY) {
+            velocityHistory.shift();
+          }
+          
+          const avgVelocity = velocityHistory.reduce((a, b) => a + b, 0) / velocityHistory.length;
+          
+          lastX = x;
+          lastY = y;
+          lastTime = time;
+          
+          return avgVelocity;
+        };
+
+        const updateGlowSize = (velocity: number): void => {
+          const normalizedVelocity = Math.min(velocity / MAX_VELOCITY, 1);
+          const easedVelocity = Math.pow(normalizedVelocity, 0.6);
+          targetSize = MIN_GLOW_SIZE + (MAX_GLOW_SIZE - MIN_GLOW_SIZE) * easedVelocity;
+        };
+
+        const animateGlow = () => {
+          const now = performance.now();
+          const timeSinceMove = now - lastMoveTime;
+          
+          currentX = lerp(currentX, targetX, SMOOTH_FOLLOW_SPEED);
+          currentY = lerp(currentY, targetY, SMOOTH_FOLLOW_SPEED);
+          currentSize = lerp(currentSize, targetSize, 0.1);
+          
+          // Clamp lerped values to card bounds to prevent overflow
+          const rect = getCachedRect();
+          const clampedX = Math.max(0, Math.min(currentX, rect.width));
+          const clampedY = Math.max(0, Math.min(currentY, rect.height));
+          
+          (card as HTMLElement).style.setProperty('--card-cursor-x', `${clampedX}px`);
+          (card as HTMLElement).style.setProperty('--card-cursor-y', `${clampedY}px`);
+          (card as HTMLElement).style.setProperty('--card-glow-size', `${currentSize}px`);
+          
+          if (timeSinceMove < fadeOutDelay) {
+            (card as HTMLElement).style.setProperty('--card-glow-opacity', '1');
+            positionAnimationFrame = requestAnimationFrame(animateGlow);
+          } else if (timeSinceMove < fadeOutDelay + fadeOutDuration) {
+            const fadeProgress = (timeSinceMove - fadeOutDelay) / fadeOutDuration;
+            const opacity = 1 - fadeProgress;
+            (card as HTMLElement).style.setProperty('--card-glow-opacity', opacity.toString());
+            positionAnimationFrame = requestAnimationFrame(animateGlow);
+          } else {
+            (card as HTMLElement).style.setProperty('--card-glow-opacity', '0');
+            positionAnimationFrame = null;
+          }
+        };
+
+        const handleMouseMove = (e: MouseEvent) => {
+          const now = performance.now();
+          const rect = getCachedRect();
+          // Clamp relative position to card bounds to prevent overflow
+          const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+          const y = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
+          
+          targetX = x;
+          targetY = y;
+          currentVelocity = calculateVelocity(x, y, now);
+          updateGlowSize(currentVelocity);
+          lastMoveTime = now;
+          
+          if (!positionAnimationFrame) {
+            positionAnimationFrame = requestAnimationFrame(animateGlow);
+          }
+        };
+
+        const handleMouseLeave = () => {
+          if (fadeAnimationFrame) {
+            cancelAnimationFrame(fadeAnimationFrame);
+            fadeAnimationFrame = null;
+          }
+          if (positionAnimationFrame) {
+            cancelAnimationFrame(positionAnimationFrame);
+            positionAnimationFrame = null;
+          }
+          
+          cachedRect = null;
+          lastMoveTime = 0;
+          lastTime = 0;
+          velocityHistory.length = 0;
+          currentVelocity = 0;
+          targetSize = MIN_GLOW_SIZE;
+          
+          (card as HTMLElement).style.setProperty('--card-glow-opacity', '0');
+        };
+
+        card.addEventListener('mousemove', handleMouseMove as EventListener);
+        card.addEventListener('mouseleave', handleMouseLeave);
+      });
+
+      // Setup glow effect for search inputs
+      searchInputs.forEach((input) => {
+        if ((input as any).__glowSetup) return;
+        (input as any).__glowSetup = true;
+
+        let lastMoveTime = 0;
+        let fadeAnimationFrame: number | null = null;
+        let positionAnimationFrame: number | null = null;
+        let cachedRect: DOMRect | null = null;
+        let rectCacheTime = 0;
+        
+        let targetX = 0;
+        let targetY = 0;
+        let currentX = 0;
+        let currentY = 0;
+        
+        let lastX = 0;
+        let lastY = 0;
+        let lastTime = 0;
+        const velocityHistory: number[] = [];
+        const MAX_VELOCITY_HISTORY = 5;
+        let currentVelocity = 0;
+        
+        let targetSize = 200;
+        let currentSize = 200;
+        
+        const fadeOutDelay = 200;
+        const fadeOutDuration = 300;
+        const RECT_CACHE_DURATION = 100;
+        const SMOOTH_FOLLOW_SPEED = 0.15;
+        const MIN_GLOW_SIZE = 150;
+        const MAX_GLOW_SIZE = 500;
+        const MAX_VELOCITY = 2000;
+
+        const getCachedRect = (): DOMRect => {
+          const now = performance.now();
+          if (!cachedRect || (now - rectCacheTime) > RECT_CACHE_DURATION) {
+            cachedRect = (input as HTMLElement).getBoundingClientRect();
+            rectCacheTime = now;
+          }
+          return cachedRect;
+        };
+
+        const lerp = (start: number, end: number, factor: number): number => {
+          return start + (end - start) * factor;
+        };
+
+        const calculateVelocity = (x: number, y: number, time: number): number => {
+          if (lastTime === 0) {
+            lastX = x;
+            lastY = y;
+            lastTime = time;
+            return 0;
+          }
+          
+          const deltaTime = (time - lastTime) / 1000;
+          if (deltaTime <= 0) return currentVelocity;
+          
+          const deltaX = x - lastX;
+          const deltaY = y - lastY;
+          const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+          const instantVelocity = distance / deltaTime;
+          
+          velocityHistory.push(instantVelocity);
+          if (velocityHistory.length > MAX_VELOCITY_HISTORY) {
+            velocityHistory.shift();
+          }
+          
+          const avgVelocity = velocityHistory.reduce((a, b) => a + b, 0) / velocityHistory.length;
+          
+          lastX = x;
+          lastY = y;
+          lastTime = time;
+          
+          return avgVelocity;
+        };
+
+        const updateGlowSize = (velocity: number): void => {
+          const normalizedVelocity = Math.min(velocity / MAX_VELOCITY, 1);
+          const easedVelocity = Math.pow(normalizedVelocity, 0.6);
+          targetSize = MIN_GLOW_SIZE + (MAX_GLOW_SIZE - MIN_GLOW_SIZE) * easedVelocity;
+        };
+
+        const animateGlow = () => {
+          const now = performance.now();
+          const timeSinceMove = now - lastMoveTime;
+          
+          currentX = lerp(currentX, targetX, SMOOTH_FOLLOW_SPEED);
+          currentY = lerp(currentY, targetY, SMOOTH_FOLLOW_SPEED);
+          currentSize = lerp(currentSize, targetSize, 0.1);
+          
+          // Clamp lerped values to input bounds to prevent overflow
+          const rect = getCachedRect();
+          const clampedX = Math.max(0, Math.min(currentX, rect.width));
+          const clampedY = Math.max(0, Math.min(currentY, rect.height));
+          
+          (input as HTMLElement).style.setProperty('--card-cursor-x', `${clampedX}px`);
+          (input as HTMLElement).style.setProperty('--card-cursor-y', `${clampedY}px`);
+          (input as HTMLElement).style.setProperty('--card-glow-size', `${currentSize}px`);
+          
+          if (timeSinceMove < fadeOutDelay) {
+            (input as HTMLElement).style.setProperty('--card-glow-opacity', '1');
+            positionAnimationFrame = requestAnimationFrame(animateGlow);
+          } else if (timeSinceMove < fadeOutDelay + fadeOutDuration) {
+            const fadeProgress = (timeSinceMove - fadeOutDelay) / fadeOutDuration;
+            const opacity = 1 - fadeProgress;
+            (input as HTMLElement).style.setProperty('--card-glow-opacity', opacity.toString());
+            positionAnimationFrame = requestAnimationFrame(animateGlow);
+          } else {
+            (input as HTMLElement).style.setProperty('--card-glow-opacity', '0');
+            positionAnimationFrame = null;
+          }
+        };
+
+        const handleMouseMove = (e: Event) => {
+          const mouseEvent = e as MouseEvent;
+          const now = performance.now();
+          const rect = getCachedRect();
+          // Clamp relative position to input bounds to prevent overflow
+          const x = Math.max(0, Math.min(mouseEvent.clientX - rect.left, rect.width));
+          const y = Math.max(0, Math.min(mouseEvent.clientY - rect.top, rect.height));
+          
+          targetX = x;
+          targetY = y;
+          currentVelocity = calculateVelocity(x, y, now);
+          updateGlowSize(currentVelocity);
+          lastMoveTime = now;
+          
+          if (!positionAnimationFrame) {
+            positionAnimationFrame = requestAnimationFrame(animateGlow);
+          }
+        };
+
+        const handleMouseLeave = () => {
+          if (fadeAnimationFrame) {
+            cancelAnimationFrame(fadeAnimationFrame);
+            fadeAnimationFrame = null;
+          }
+          if (positionAnimationFrame) {
+            cancelAnimationFrame(positionAnimationFrame);
+            positionAnimationFrame = null;
+          }
+          
+          cachedRect = null;
+          lastMoveTime = 0;
+          lastTime = 0;
+          velocityHistory.length = 0;
+          currentVelocity = 0;
+          targetSize = MIN_GLOW_SIZE;
+          
+          (input as HTMLElement).style.setProperty('--card-glow-opacity', '0');
+        };
+
+        input.addEventListener('mousemove', handleMouseMove);
+        input.addEventListener('mouseleave', handleMouseLeave);
+      });
+    };
+
+    // Initial setup
+    setTimeout(setupElements, 100);
+    
+    // Re-setup after data loads
+    setTimeout(setupElements, 500);
+    
+    // Watch for changes in table cards and search inputs
+    this.tableCards?.changes.subscribe(() => {
+      setTimeout(setupElements, 100);
+    });
+  }
+
   public fetchClients(): void {
-    // Start sequence: show skeleton immediately; loader after a short delay
     this.isLoading = true;
-    this.showSkeleton = true;
-    this.showLoaderOverlay = false;
+    this.showContent = false;
 
-    // clear any previous timer
-    if (this.loaderOverlayTimer) {
-      clearTimeout(this.loaderOverlayTimer);
-      this.loaderOverlayTimer = null;
-    }
-
-    // Only show the loader overlay if request takes longer than this (ms)
-    const LOADER_DELAY_MS = 180;
-    this.loaderOverlayTimer = setTimeout(() => {
-      this.showLoaderOverlay = true;
-      this.loaderOverlayTimer = null;
-    }, LOADER_DELAY_MS);
-
-    // Optionally clear table data on first page to avoid confusing tics
-    if (this.currentPage === 0) {
-      this.clients = [];
-      this.paginationData = null;
-    }
+    // Clear clients array to show skeleton placeholder during pagination
+    // Keep paginationData to prevent layout shift in pagination controls
+    this.clients = [];
 
     const filterName = this.activeSearchTerm.trim() || null;
-
-    // Keep incoming data in temp var so we can reveal it after skeleton fades
-    this.pendingFetchedData = null;
 
     this.clientService.getFilteredClients(filterName, this.currentPage, this.pageSize)
       .subscribe({
         next: (data) => {
-          // store incoming data; hide loader overlay immediately
-          if (this.loaderOverlayTimer) {
-            clearTimeout(this.loaderOverlayTimer);
-            this.loaderOverlayTimer = null;
-          }
-          this.showLoaderOverlay = false;
-
-          // mark loading finished (drives :leave animation)
+          // Store the data temporarily
+          const loadedData = data;
+          
+          // Start skeleton fade-out animation by setting isLoading to false
           this.isLoading = false;
-
-          // cache data until we remove skeleton (so content doesn't pop in under skeleton)
-          this.pendingFetchedData = data;
-
-          // after a short fade-out delay, apply the new content and hide skeleton
-          const SKELETON_FADE_MS = 160;
+          
+          // Wait for skeleton fade-out animation to complete (0.2s) before showing content
           setTimeout(() => {
-            if (this.pendingFetchedData) {
-              this.clients = this.pendingFetchedData.content;
-              this.paginationData = this.pendingFetchedData;
-              // bounds-check for currentPage vs totalPages
-              if (this.paginationData && this.paginationData.totalPages > 0 && this.currentPage >= this.paginationData.totalPages) {
-                this.currentPage = Math.max(0, this.paginationData.totalPages - 1);
-              }
-              this.pendingFetchedData = null;
+            this.clients = loadedData.content;
+            this.paginationData = loadedData;
+            // bounds-check for currentPage vs totalPages
+            if (this.paginationData && this.paginationData.totalPages > 0 && this.currentPage >= this.paginationData.totalPages) {
+              this.currentPage = Math.max(0, this.paginationData.totalPages - 1);
             }
-            // hide skeleton to reveal content
-            this.showSkeleton = false;
-          }, SKELETON_FADE_MS);
+            this.showContent = true;
+            // Re-setup glow effect after content is shown
+            setTimeout(() => this.setupGlowEffect(), 100);
+          }, 200); // Match skeleton fade-out duration (0.2s)
         },
         error: (err) => {
-          // cleanup timers & overlays
-          if (this.loaderOverlayTimer) {
-            clearTimeout(this.loaderOverlayTimer);
-            this.loaderOverlayTimer = null;
-          }
-          this.showLoaderOverlay = false;
           this.isLoading = false;
-
-          // hide skeleton after short delay so UI doesn't instantly jump
           setTimeout(() => {
-            this.showSkeleton = false;
-          }, 120);
-
-          // clear data so empty state shows
-          this.clients = [];
-          this.paginationData = null;
-
-          this.toastService.showError('Could not load clients.');
-          console.error("Error loading clients:", err);
+            this.clients = [];
+            // Only clear paginationData on error if we don't have valid data
+            if (!this.paginationData || this.paginationData.totalElements === 0) {
+              this.paginationData = null;
+            }
+            this.showContent = true; // Show empty state
+            this.handleApiError(err, 'load');
+          }, 200);
         }
       });
   }
@@ -251,7 +712,8 @@ export class ClientPageComponent implements OnInit {
     if (this.isModalClosing || this.isSaving) return;
     this.isModalClosing = true;
     setTimeout(() => {
-      document.body.style.overflow = 'auto';
+      // Remove inline style instead of setting to 'auto' to avoid conflicts with CSS
+      document.body.style.overflow = '';
       this.isAddModalVisible = false;
       this.isModalClosing = false;
     }, 300);
@@ -297,17 +759,14 @@ export class ClientPageComponent implements OnInit {
 
   // --- Error Handling ---
   private handleApiError(err: any, context: 'add' | 'update' | 'load'): void {
-    let action: string = context;
-    if (context !== 'load') {
-      action = context === 'add' ? 'adding' : 'updating';
-    }
-
-    if (err.error?.message && typeof err.error.message === 'string') {
-      this.toastService.showError(err.error.message);
+    let action: string;
+    if (context === 'load') {
+      action = 'load clients';
     } else {
-      this.toastService.showError(`Error ${action} client. Please try again.`);
-      console.error(`Error ${action} client:`, err);
+      action = context === 'add' ? 'add client' : 'update client';
     }
+    const defaultMessage = `Unable to ${action}. Please try again.`;
+    handleHttpError(err, this.toastService, defaultMessage);
   }
 
   // --- TrackBy ---
